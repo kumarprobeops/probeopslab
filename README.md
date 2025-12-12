@@ -1,26 +1,60 @@
-# CF Demo Labs
+# ProbeOps Lab
 
-Cloudflare demo lab website for tutorials at `probeopslab.com`.
+Cloudflare demo lab for tutorials - redirect testing, geo-routing, and request debugging.
 
-Features redirect labs, geo-routing demos, and request debugging tools.
+## Features
 
-## Quick Start (Development)
+- **Redirect Labs** - Test 301, 302, 307, 308 redirects
+- **Geo-Routing** - Cloudflare geo-based redirect demos
+- **Request Debugger** - View headers, IP, and geo data
+- **Host Lab** - Test www/apex and HTTP/HTTPS behavior
+
+## Quick Start
+
+### 1. Clone and Configure
 
 ```bash
-# Clone and navigate to project
-cd cf-demo-site
+git clone https://github.com/kumarprobeops/probeopslab.git
+cd probeopslab
 
-# Start development environment
-docker compose up -d
-
-# View logs
-docker compose logs -f app
-
-# Access the site
-open http://localhost
+# Create your configuration
+cp .env.example .env
 ```
 
-The development setup runs HTTP only (no TLS) with hot-reload enabled.
+Edit `.env` with your domain:
+
+```env
+DOMAIN=yourdomain.com
+LE_EMAIL=your-email@example.com
+```
+
+### 2. Add SSL Certificates
+
+Place your SSL certificates in the `cloudflare/` directory:
+
+```bash
+mkdir -p cloudflare
+# Add your certificates:
+# cloudflare/fullchain.pem
+# cloudflare/privkey.pem
+```
+
+**Options for certificates:**
+- **Cloudflare Origin CA** - Free certificates for Cloudflare-proxied domains
+- **Let's Encrypt** - Use the included certbot container
+- **Self-signed** - For local testing only
+
+### 3. Start Services
+
+```bash
+docker compose up -d
+```
+
+### 4. Verify
+
+```bash
+curl -I https://yourdomain.com
+```
 
 ## Endpoints
 
@@ -35,128 +69,73 @@ The development setup runs HTTP only (no TLS) with hot-reload enabled.
 | `/us`, `/ca`, `/fi`, `/row` | Region landing pages |
 | `/host-lab` | Host/scheme testing |
 
-## Production Deployment
+## Using Let's Encrypt
 
-### Prerequisites
-
-- VPS with Docker and Docker Compose installed
-- Domain pointing to server IP (DNS A record)
-- Cloudflare account (optional, for proxy features)
-
-### Setup
-
-1. **Clone the repository:**
-   ```bash
-   git clone <repo-url> cf-demo-site
-   cd cf-demo-site
-   ```
-
-2. **Create environment file:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your values
-   ```
-
-3. **Start services (without TLS first):**
-   ```bash
-   # Start app and nginx with HTTP only
-   docker compose up -d app nginx
-   ```
-
-4. **Issue TLS certificate:**
-   ```bash
-   # Create webroot directory
-   mkdir -p certbot/www certbot/conf
-
-   # Issue certificate
-   docker compose run --rm certbot certonly \
-       --webroot \
-       --webroot-path=/var/www/certbot \
-       --email your-email@example.com \
-       --agree-tos \
-       --no-eff-email \
-       -d probeopslab.com \
-       -d www.probeopslab.com
-   ```
-
-5. **Switch to production NGINX config:**
-   ```bash
-   # Remove override file to use production config
-   rm docker-compose.override.yml
-
-   # Restart nginx with TLS
-   docker compose up -d
-   ```
-
-6. **Verify:**
-   ```bash
-   curl -I https://probeopslab.com
-   ```
-
-### Certificate Renewal
-
-Certificates auto-renew via the certbot container. To manually renew:
+If you prefer Let's Encrypt over Cloudflare Origin CA:
 
 ```bash
-docker compose run --rm certbot renew
-docker compose exec nginx nginx -s reload
+# Start services without SSL first (modify nginx config)
+# Then issue certificate:
+docker compose run --rm certbot certonly \
+    --webroot \
+    --webroot-path=/var/www/certbot \
+    --email $LE_EMAIL \
+    --agree-tos \
+    --no-eff-email \
+    -d $DOMAIN \
+    -d www.$DOMAIN
+
+# Restart nginx
+docker compose restart nginx
 ```
 
-### Cloudflare Integration
+## Cloudflare Integration
 
-After TLS is working:
+For full Cloudflare features:
 
 1. Set DNS record to **Proxied** (orange cloud)
 2. Configure SSL/TLS mode to **Full (strict)**
 3. Create Redirect Rules for geo-based routing:
 
-   ```
-   # Example: Redirect CA visitors
-   Expression: (http.request.uri.path eq "/geo-redirect" and ip.geoip.country eq "CA")
-   Action: Redirect to /ca (302)
-   ```
+```
+# Example: Redirect CA visitors
+Expression: (http.request.uri.path eq "/geo-redirect" and ip.geoip.country eq "CA")
+Action: Redirect to /ca (302)
+```
 
 ## Project Structure
 
 ```
-cf-demo-site/
+probeopslab/
 ├── app/                    # FastAPI application
-│   ├── main.py            # Routes and logic
-│   ├── templates/         # Jinja2 HTML templates
-│   └── static/            # CSS and assets
+│   ├── main.py             # Routes and logic
+│   ├── templates/          # Jinja2 HTML templates
+│   └── static/             # CSS and assets
 ├── nginx/                  # NGINX configuration
-│   ├── nginx.conf         # Production config
-│   ├── nginx.dev.conf     # Development config
-│   └── snippets/          # SSL settings
-├── certbot/               # Let's Encrypt
-│   └── scripts/           # Cert management scripts
-├── docker-compose.yml     # Production compose
-└── docker-compose.override.yml  # Dev overrides
+│   ├── nginx.conf.template # Config template (uses $DOMAIN)
+│   ├── docker-entrypoint.sh # Generates config from template
+│   └── snippets/           # SSL settings
+├── certbot/                # Let's Encrypt automation
+├── cloudflare/             # SSL certificates (gitignored)
+├── docker-compose.yml      # Main compose file
+└── .env.example            # Configuration template
+```
+
+## Development
+
+For local development without SSL:
+
+```bash
+# Use the dev nginx config
+cp nginx/nginx.dev.conf nginx/nginx.conf.template
+
+# Start services
+docker compose up -d
+
+# Access at http://localhost
 ```
 
 ## Troubleshooting
-
-### Certificate Issues
-
-If certificates fail to issue:
-
-```bash
-# Check ACME challenge is accessible
-curl http://probeopslab.com/.well-known/acme-challenge/test
-
-# View certbot logs
-docker compose logs certbot
-```
-
-### App Not Responding
-
-```bash
-# Check app health
-docker compose exec app python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/').status)"
-
-# View app logs
-docker compose logs -f app
-```
 
 ### NGINX Config Test
 
@@ -164,18 +143,19 @@ docker compose logs -f app
 docker compose exec nginx nginx -t
 ```
 
-## Development
+### View Logs
 
-### Hot Reload
+```bash
+docker compose logs -f app
+docker compose logs -f nginx
+```
 
-The dev setup mounts the `app/` directory, so changes to Python files and templates are reflected immediately.
+### App Health Check
 
-### Adding New Endpoints
-
-1. Add route in `app/main.py`
-2. Create template in `app/templates/`
-3. Refresh browser
+```bash
+docker compose exec app python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/').status)"
+```
 
 ## License
 
-Demo site for ProbeOps tutorials.
+MIT License - See LICENSE file for details.
