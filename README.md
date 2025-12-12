@@ -1,161 +1,75 @@
 # ProbeOps Lab
 
-Cloudflare demo lab for tutorials - redirect testing, geo-routing, and request debugging.
+A public reference edge for testing CDN behavior, redirects, caching, and geo-routing.
 
-## Features
+**Live:** https://probeopslab.com
 
-- **Redirect Labs** - Test 301, 302, 307, 308 redirects
-- **Geo-Routing** - Cloudflare geo-based redirect demos
-- **Request Debugger** - View headers, IP, and geo data
-- **Host Lab** - Test www/apex and HTTP/HTTPS behavior
+## The Problem
 
-## Quick Start
+You're debugging why:
+- Your CDN isn't caching what it should
+- Your 301 redirects are actually 302s (RIP SEO)
+- Your geo-routing sends Canadians to the US site
+- Your load balancer times out before the backend responds
+- Your VPN is leaking your real IP
 
-### 1. Clone and Configure
+You need a stable, predictable endpoint that doesn't change. Not your staging server that breaks every sprint.
 
-```bash
-git clone https://github.com/kumarprobeops/probeopslab.git
-cd probeopslab
+## What This Is
 
-# Create your configuration
-cp .env.example .env
-```
-
-Edit `.env` with your domain:
-
-```env
-DOMAIN=yourdomain.com
-LE_EMAIL=your-email@example.com
-```
-
-### 2. Add SSL Certificates
-
-Place your SSL certificates in the `cloudflare/` directory:
+A minimal, stateless test lab running behind Cloudflare. No cookies, no auth, no tracking. Just predictable responses you can curl against.
 
 ```bash
-mkdir -p cloudflare
-# Add your certificates:
-# cloudflare/fullchain.pem
-# cloudflare/privkey.pem
-```
+# What's my IP and country?
+curl -s https://probeopslab.com/debug.json | jq '{ip: .client_ip, country: .country}'
 
-**Options for certificates:**
-- **Cloudflare Origin CA** - Free certificates for Cloudflare-proxied domains
-- **Let's Encrypt** - Use the included certbot container
-- **Self-signed** - For local testing only
+# Is this a 301 or 302?
+curl -sI https://probeopslab.com/r/301 | grep HTTP
 
-### 3. Start Services
+# Simulate a slow backend
+curl -w "Time: %{time_total}s\n" https://probeopslab.com/delay/3000
 
-```bash
-docker compose up -d
-```
-
-### 4. Verify
-
-```bash
-curl -I https://yourdomain.com
+# Get a 503 to test error handling
+curl -sI https://probeopslab.com/status/503
 ```
 
 ## Endpoints
 
-| Endpoint | Description |
-|----------|-------------|
-| `/` | Lab index with links to all labs |
-| `/debug` | Request headers and geo data display |
-| `/redirect-lab` | Redirect test menu |
-| `/r/301`, `/r/302`, `/r/307`, `/r/308` | Redirect endpoints |
-| `/final` | Redirect destination page |
-| `/geo-redirect` | Geo routing entry point |
-| `/us`, `/ca`, `/fi`, `/row` | Region landing pages |
-| `/host-lab` | Host/scheme testing |
+| Path | What it does |
+|------|--------------|
+| `/debug` | Shows your IP, geo, headers |
+| `/debug.json` | Same, but JSON for scripts |
+| `/r/301`, `/r/302`, `/r/307`, `/r/308` | Redirect with specific status code |
+| `/cache/*` | Various Cache-Control headers |
+| `/delay/{ms}` | Respond after N milliseconds |
+| `/status/{code}` | Return specific HTTP status |
+| `/size/{bytes}` | Return N-byte response |
 
-## Using Let's Encrypt
+Full list at https://probeopslab.com/use-cases
 
-If you prefer Let's Encrypt over Cloudflare Origin CA:
-
-```bash
-# Start services without SSL first (modify nginx config)
-# Then issue certificate:
-docker compose run --rm certbot certonly \
-    --webroot \
-    --webroot-path=/var/www/certbot \
-    --email $LE_EMAIL \
-    --agree-tos \
-    --no-eff-email \
-    -d $DOMAIN \
-    -d www.$DOMAIN
-
-# Restart nginx
-docker compose restart nginx
-```
-
-## Cloudflare Integration
-
-For full Cloudflare features:
-
-1. Set DNS record to **Proxied** (orange cloud)
-2. Configure SSL/TLS mode to **Full (strict)**
-3. Create Redirect Rules for geo-based routing:
-
-```
-# Example: Redirect CA visitors
-Expression: (http.request.uri.path eq "/geo-redirect" and ip.geoip.country eq "CA")
-Action: Redirect to /ca (302)
-```
-
-## Project Structure
-
-```
-probeopslab/
-├── app/                    # FastAPI application
-│   ├── main.py             # Routes and logic
-│   ├── templates/          # Jinja2 HTML templates
-│   └── static/             # CSS and assets
-├── nginx/                  # NGINX configuration
-│   ├── nginx.conf.template # Config template (uses $DOMAIN)
-│   ├── docker-entrypoint.sh # Generates config from template
-│   └── snippets/           # SSL settings
-├── certbot/                # Let's Encrypt automation
-├── cloudflare/             # SSL certificates (gitignored)
-├── docker-compose.yml      # Main compose file
-└── .env.example            # Configuration template
-```
-
-## Development
-
-For local development without SSL:
+## Run Your Own
 
 ```bash
-# Use the dev nginx config
-cp nginx/nginx.dev.conf nginx/nginx.conf.template
-
-# Start services
+git clone https://github.com/kumarprobeops/probeopslab.git
+cd probeopslab
+cp .env.example .env
+# Edit .env with your domain
 docker compose up -d
-
-# Access at http://localhost
 ```
 
-## Troubleshooting
+Needs SSL certs in `cloudflare/` directory (Cloudflare Origin CA or Let's Encrypt).
 
-### NGINX Config Test
+## Stack
 
-```bash
-docker compose exec nginx nginx -t
-```
+- FastAPI + Jinja2
+- NGINX
+- Docker Compose
+- Cloudflare (optional but recommended)
 
-### View Logs
+## Contributing
 
-```bash
-docker compose logs -f app
-docker compose logs -f nginx
-```
-
-### App Health Check
-
-```bash
-docker compose exec app python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/').status)"
-```
+PRs welcome. Keep it simple. This is a utility, not a framework.
 
 ## License
 
-MIT License - See LICENSE file for details.
+MIT
