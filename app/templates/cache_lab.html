@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Cache Lab{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Cache Lab</h1>
+    <p class="subtitle">Test HTTP caching behavior with different Cache-Control headers</p>
+</div>
+
+<div class="card">
+    <h2>Cache Test Endpoints</h2>
+    <p>Each endpoint returns JSON with the specified <code>Cache-Control</code> header. Use these to verify how your CDN or proxy handles caching directives.</p>
+
+    <div class="cache-grid">
+        <a href="/cache/public-short" class="cache-link" target="_blank">
+            <span class="cache-name">public-short</span>
+            <span class="cache-header">public, max-age=60</span>
+            <span class="cache-desc">Browser &amp; CDN cache for 60 seconds</span>
+        </a>
+
+        <a href="/cache/public-long" class="cache-link" target="_blank">
+            <span class="cache-name">public-long</span>
+            <span class="cache-header">public, max-age=86400</span>
+            <span class="cache-desc">Browser &amp; CDN cache for 24 hours</span>
+        </a>
+
+        <a href="/cache/no-store" class="cache-link" target="_blank">
+            <span class="cache-name">no-store</span>
+            <span class="cache-header">no-store</span>
+            <span class="cache-desc">Never cache this response</span>
+        </a>
+
+        <a href="/cache/no-cache" class="cache-link" target="_blank">
+            <span class="cache-name">no-cache</span>
+            <span class="cache-header">no-cache</span>
+            <span class="cache-desc">Always revalidate before using cache</span>
+        </a>
+
+        <a href="/cache/private" class="cache-link" target="_blank">
+            <span class="cache-name">private</span>
+            <span class="cache-header">private, max-age=60</span>
+            <span class="cache-desc">Browser only, not CDN/shared cache</span>
+        </a>
+
+        <a href="/cache/s-maxage" class="cache-link" target="_blank">
+            <span class="cache-name">s-maxage</span>
+            <span class="cache-header">public, max-age=60, s-maxage=300</span>
+            <span class="cache-desc">Browser: 60s, CDN: 300s</span>
+        </a>
+
+        <a href="/cache/stale-while-revalidate" class="cache-link" target="_blank">
+            <span class="cache-name">stale-while-revalidate</span>
+            <span class="cache-header">public, max-age=60, stale-while-revalidate=300</span>
+            <span class="cache-desc">Serve stale, update in background</span>
+        </a>
+
+        <a href="/cache/immutable" class="cache-link" target="_blank">
+            <span class="cache-name">immutable</span>
+            <span class="cache-header">public, max-age=31536000, immutable</span>
+            <span class="cache-desc">Cache forever, never revalidate</span>
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Response Format</h2>
+    <p>Each endpoint returns JSON with timestamp for cache validation:</p>
+    <pre class="code-block"><code>{
+  "path": "/cache/public-short",
+  "generated_at": "2025-12-12T06:20:00Z",
+  "cache_control": "public, max-age=60",
+  "description": "Public cache, 60 second max-age"
+}</code></pre>
+    <p>Response headers include:</p>
+    <ul class="tips-list">
+        <li><code>Cache-Control</code> - The caching directive</li>
+        <li><code>ETag</code> - For conditional requests</li>
+        <li><code>Last-Modified</code> - For conditional requests</li>
+        <li><code>X-Cache-Test</code> - Marker header (probeopslab)</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2>Testing Tips</h2>
+    <ul class="tips-list">
+        <li>Compare <code>generated_at</code> timestamps across requests to verify caching</li>
+        <li>Use DevTools Network tab to check <code>cf-cache-status</code> header (HIT/MISS/EXPIRED)</li>
+        <li>Test <code>private</code> vs <code>public</code> through your CDN to verify shared cache behavior</li>
+        <li>Use <code>s-maxage</code> to test different TTLs for browser vs CDN</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2>Example curl Commands</h2>
+    <pre class="code-block"><code># Test public-short caching
+curl -s https://{{ ctx.host }}/cache/public-short
+
+# Show all response headers
+curl -sD - https://{{ ctx.host }}/cache/public-short
+
+# Test conditional request with ETag
+curl -H "If-None-Match: \"abc123\"" https://{{ ctx.host }}/cache/public-short
+
+# Compare timestamps (run twice, check if generated_at changes)
+curl -s https://{{ ctx.host }}/cache/public-short | jq .generated_at</code></pre>
+</div>
+{% endblock %}

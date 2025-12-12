@@ -1,17 +1,18 @@
 """
-CF Demo Site - Cloudflare Redirect & Geo Labs
+ProbeOps Lab - CDN/DevOps Testing Utility
 https://probeopslab.com
 """
 
+import hashlib
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
+from fastapi import FastAPI, Request, Response
+from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-app = FastAPI(title="CF Demo Labs", docs_url=None, redoc_url=None)
+app = FastAPI(title="ProbeOps Lab", docs_url=None, redoc_url=None)
 
 # Mount static files and templates
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -32,7 +33,21 @@ ALLOWED_HEADERS = [
     "user-agent",
     "accept-language",
     "accept-encoding",
+    "cf-cache-status",
+    "cf-worker",
 ]
+
+# Cache endpoint configurations
+CACHE_CONFIGS = {
+    "public-short": {"cache_control": "public, max-age=60", "description": "Public cache, 60 second max-age"},
+    "public-long": {"cache_control": "public, max-age=86400", "description": "Public cache, 24 hour max-age"},
+    "no-store": {"cache_control": "no-store", "description": "No caching allowed"},
+    "no-cache": {"cache_control": "no-cache", "description": "Must revalidate before using cached version"},
+    "private": {"cache_control": "private, max-age=60", "description": "Private cache only (browser), not shared (CDN)"},
+    "s-maxage": {"cache_control": "public, max-age=60, s-maxage=300", "description": "Browser: 60s, CDN/shared cache: 300s"},
+    "stale-while-revalidate": {"cache_control": "public, max-age=60, stale-while-revalidate=300", "description": "Serve stale while revalidating in background"},
+    "immutable": {"cache_control": "public, max-age=31536000, immutable", "description": "Immutable content, cache for 1 year"},
+}
 
 
 def get_request_context(request: Request) -> dict:
@@ -90,6 +105,79 @@ async def debug(request: Request):
 async def robots():
     """Disallow all indexing for demo site."""
     return "User-agent: *\nDisallow: /"
+
+
+# =============================================================================
+# Cache Labs
+# =============================================================================
+
+
+@app.get("/cache", response_class=HTMLResponse)
+async def cache_lab(request: Request):
+    """Cache lab index page with documentation."""
+    ctx = get_request_context(request)
+    return templates.TemplateResponse("cache_lab.html", {"request": request, "ctx": ctx, "cache_configs": CACHE_CONFIGS})
+
+
+def create_cache_response(path: str, cache_control: str, description: str) -> Response:
+    """Create a JSON response with appropriate cache headers."""
+    now = datetime.now(timezone.utc)
+    body = {"path": path, "generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "cache_control": cache_control, "description": description}
+    etag = hashlib.md5(str(body).encode()).hexdigest()[:16]
+    response = JSONResponse(content=body)
+    response.headers["Cache-Control"] = cache_control
+    response.headers["ETag"] = f'"{etag}"'
+    response.headers["Last-Modified"] = now.strftime("%a, %d %b %Y %H:%M:%S GMT")
+    response.headers["X-Cache-Test"] = "probeopslab"
+    return response
+
+
+@app.get("/cache/public-short")
+async def cache_public_short():
+    c = CACHE_CONFIGS["public-short"]
+    return create_cache_response("/cache/public-short", c["cache_control"], c["description"])
+
+
+@app.get("/cache/public-long")
+async def cache_public_long():
+    c = CACHE_CONFIGS["public-long"]
+    return create_cache_response("/cache/public-long", c["cache_control"], c["description"])
+
+
+@app.get("/cache/no-store")
+async def cache_no_store():
+    c = CACHE_CONFIGS["no-store"]
+    return create_cache_response("/cache/no-store", c["cache_control"], c["description"])
+
+
+@app.get("/cache/no-cache")
+async def cache_no_cache():
+    c = CACHE_CONFIGS["no-cache"]
+    return create_cache_response("/cache/no-cache", c["cache_control"], c["description"])
+
+
+@app.get("/cache/private")
+async def cache_private():
+    c = CACHE_CONFIGS["private"]
+    return create_cache_response("/cache/private", c["cache_control"], c["description"])
+
+
+@app.get("/cache/s-maxage")
+async def cache_s_maxage():
+    c = CACHE_CONFIGS["s-maxage"]
+    return create_cache_response("/cache/s-maxage", c["cache_control"], c["description"])
+
+
+@app.get("/cache/stale-while-revalidate")
+async def cache_stale_while_revalidate():
+    c = CACHE_CONFIGS["stale-while-revalidate"]
+    return create_cache_response("/cache/stale-while-revalidate", c["cache_control"], c["description"])
+
+
+@app.get("/cache/immutable")
+async def cache_immutable():
+    c = CACHE_CONFIGS["immutable"]
+    return create_cache_response("/cache/immutable", c["cache_control"], c["description"])
 
 
 # =============================================================================
