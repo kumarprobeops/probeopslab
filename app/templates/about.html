@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>About this lab</h1>
+</div>
+
+<div class="card">
+    <p>ProbeOps Lab is a public "reference edge" for testing redirects, caching directives, geo routing, and request headers.</p>
+
+    <p>It runs a minimal, fixed configuration so results are predictable and scriptable.</p>
+
+    <ul class="tips-list">
+        <li>No cookies</li>
+        <li>No auth</li>
+        <li>No tracking</li>
+    </ul>
+
+    <p>Maintained by <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps</a> (we use it internally for debugging too).</p>
+
+    <p>If you need to run the same checks from multiple geographic regions, automate them, or schedule monitoring, that's what ProbeOps is for: <a href="https://probeops.com" target="_blank" rel="noopener">probeops.com</a></p>
+</div>
+
+<div class="card">
+    <h2>Source Code</h2>
+    <p>This lab is open source. View the code, report issues, or contribute on GitHub:</p>
+    <p><a href="https://github.com/kumarprobeops/probeopslab" target="_blank" rel="noopener">github.com/kumarprobeops/probeopslab</a></p>
+</div>
+{% endblock %}

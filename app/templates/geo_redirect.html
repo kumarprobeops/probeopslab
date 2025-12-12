@@ -57,20 +57,14 @@
 # Status: 302</code></pre>
 </div>
 
-<div class="card">
-    <h2>Test with ProbeOps</h2>
-    <ul class="tips-list">
-        <li>Open <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps Horizon</a> in multiple regions</li>
-        <li>Visit this page from US, Canada, Finland simultaneously</li>
-        <li>Observe different redirect destinations per region</li>
-        <li>Use Terminal to run <code>curl -I -L</code> and capture redirect chains</li>
-    </ul>
-</div>
-
 <div class="action-bar">
     <a href="/us" class="btn btn-secondary">US</a>
     <a href="/ca" class="btn btn-secondary">CA</a>
     <a href="/fi" class="btn btn-secondary">FI</a>
     <a href="/row" class="btn btn-secondary">ROW</a>
+</div>
+
+<div class="tip-box">
+    <p><strong>Tip:</strong> Geo routing is easiest to verify from multiple regions. ProbeOps can run this from 6+ locations → <a href="https://probeops.com" target="_blank" rel="noopener">probeops.com</a></p>
 </div>
 {% endblock %}

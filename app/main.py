@@ -96,6 +96,13 @@ async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "ctx": ctx})
 
 
+@app.get("/about", response_class=HTMLResponse)
+async def about(request: Request):
+    """About page - explains what this lab is and who maintains it."""
+    ctx = get_request_context(request)
+    return templates.TemplateResponse("about.html", {"request": request, "ctx": ctx})
+
+
 @app.get("/debug", response_class=HTMLResponse)
 async def debug(request: Request):
     """Request and geo debug page - sanitized headers display."""

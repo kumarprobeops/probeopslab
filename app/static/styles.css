@@ -677,6 +677,29 @@ code {
     margin: 0;
 }
 
+/* Tip box - subtle ProbeOps mention */
+.tip-box {
+    margin-top: 2rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-gray);
+    border-left: 3px solid var(--border-color);
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.tip-box p {
+    margin: 0;
+}
+
+.tip-box a {
+    color: var(--text-muted);
+    text-decoration: underline;
+}
+
+.tip-box a:hover {
+    color: var(--primary-blue);
+}
+
 .info-section {
     margin-top: 2rem;
 }

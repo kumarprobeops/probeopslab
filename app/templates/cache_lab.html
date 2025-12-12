@@ -109,4 +109,8 @@ curl -H "If-None-Match: \"abc123\"" https://{{ ctx.host }}/cache/public-short
 # Compare timestamps (run twice, check if generated_at changes)
 curl -s https://{{ ctx.host }}/cache/public-short | jq .generated_at</code></pre>
 </div>
+
+<div class="tip-box">
+    <p><strong>Tip:</strong> Cache behavior can vary by edge/region and over time. ProbeOps can run this from 6+ locations → <a href="https://probeops.com" target="_blank" rel="noopener">probeops.com</a></p>
+</div>
 {% endblock %}
