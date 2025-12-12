@@ -431,7 +431,7 @@ async def delay_endpoint(ms: int = Path(..., ge=0, le=10000)):
     )
 
 
-@app.get("/status/{code}")
+@app.api_route("/status/{code}", methods=["GET", "HEAD"])
 async def status_endpoint(code: int = Path(...)):
     """Return specified HTTP status code."""
     if code not in ALLOWED_STATUS_CODES:
