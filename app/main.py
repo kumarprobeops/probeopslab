@@ -269,25 +269,25 @@ async def redirect_lab(request: Request):
     )
 
 
-@app.get("/r/301")
+@app.api_route("/r/301", methods=["GET", "HEAD"])
 async def redirect_301():
     """301 Permanent redirect to /final."""
     return RedirectResponse(url="/final", status_code=301)
 
 
-@app.get("/r/302")
+@app.api_route("/r/302", methods=["GET", "HEAD"])
 async def redirect_302():
     """302 Found redirect to /final."""
     return RedirectResponse(url="/final", status_code=302)
 
 
-@app.get("/r/307")
+@app.api_route("/r/307", methods=["GET", "HEAD"])
 async def redirect_307():
     """307 Temporary redirect to /final."""
     return RedirectResponse(url="/final", status_code=307)
 
 
-@app.get("/r/308")
+@app.api_route("/r/308", methods=["GET", "HEAD"])
 async def redirect_308():
     """308 Permanent redirect to /final."""
     return RedirectResponse(url="/final", status_code=308)
