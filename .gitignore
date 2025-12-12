@@ -17,7 +17,7 @@ ENV/
 *.swo
 
 # Docker
-docker-compose.override.yml
+# (docker-compose.override.yml is committed - needed for dev mode)
 
 # Certificates (managed by certbot)
 certbot/conf/
