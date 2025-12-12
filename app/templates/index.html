@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Lab Index{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Cloudflare Demo Labs</h1>
+    <p class="subtitle">Test redirect rules, geo-routing, and request headers</p>
+</div>
+
+<div class="card-grid">
+    <a href="/debug" class="card">
+        <div class="card-icon">🔍</div>
+        <h2>Debug</h2>
+        <p>View sanitized request headers, geo data, and Cloudflare info</p>
+    </a>
+
+    <a href="/redirect-lab" class="card">
+        <div class="card-icon">↪️</div>
+        <h2>Redirect Lab</h2>
+        <p>Test 301, 302, 307, 308 redirects and observe behavior</p>
+    </a>
+
+    <a href="/geo-redirect" class="card">
+        <div class="card-icon">🌍</div>
+        <h2>Geo Routing</h2>
+        <p>Test Cloudflare geo-based redirects by country</p>
+    </a>
+
+    <a href="/host-lab" class="card">
+        <div class="card-icon">🔗</div>
+        <h2>Host Lab</h2>
+        <p>Test www vs apex and HTTP vs HTTPS handling</p>
+    </a>
+</div>
+
+<section class="info-section">
+    <h2>About This Site</h2>
+    <p>This demo lab is designed for Cloudflare tutorials and testing. Use it with <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps Horizon</a> to validate behaviors from multiple geographic locations.</p>
+
+    <div class="debug-mini">
+        <div class="debug-row">
+            <span class="debug-label">Your IP:</span>
+            <span class="debug-value">{{ ctx.client_ip }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Country:</span>
+            <span class="debug-value">{{ ctx.country }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">CF-Ray:</span>
+            <span class="debug-value">{{ ctx.cf_ray }}</span>
+        </div>
+    </div>
+</section>
+{% endblock %}

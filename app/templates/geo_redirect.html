@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Geo Redirect{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Geo Redirect Lab</h1>
+    <p class="subtitle">Test Cloudflare geo-based redirect rules</p>
+</div>
+
+<div class="card highlight-card">
+    <h2>Your Detected Location</h2>
+    <div class="geo-display">
+        <div class="geo-country">{{ ctx.country }}</div>
+        <div class="geo-details">
+            <span>City: {{ ctx.city }}</span>
+            <span>Region: {{ ctx.region }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>How This Works</h2>
+    <p>This endpoint is designed to be the <strong>target of Cloudflare Redirect Rules</strong>. When configured, Cloudflare will redirect visitors based on their country:</p>
+
+    <div class="geo-routes">
+        <div class="geo-route">
+            <span class="geo-code">US</span>
+            <span class="geo-arrow">→</span>
+            <a href="/us">/us</a>
+        </div>
+        <div class="geo-route">
+            <span class="geo-code">CA</span>
+            <span class="geo-arrow">→</span>
+            <a href="/ca">/ca</a>
+        </div>
+        <div class="geo-route">
+            <span class="geo-code">FI</span>
+            <span class="geo-arrow">→</span>
+            <a href="/fi">/fi</a>
+        </div>
+        <div class="geo-route">
+            <span class="geo-code">*</span>
+            <span class="geo-arrow">→</span>
+            <a href="/row">/row</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Cloudflare Rule Example</h2>
+    <pre class="code-block"><code># Redirect Rule Expression
+(http.request.uri.path eq "/geo-redirect" and ip.src.country eq "CA")
+
+# Action: Redirect
+# URL: /ca
+# Status: 302</code></pre>
+</div>
+
+<div class="card">
+    <h2>Test with ProbeOps</h2>
+    <ul class="tips-list">
+        <li>Open <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps Horizon</a> in multiple regions</li>
+        <li>Visit this page from US, Canada, Finland simultaneously</li>
+        <li>Observe different redirect destinations per region</li>
+        <li>Use Terminal to run <code>curl -I -L</code> and capture redirect chains</li>
+    </ul>
+</div>
+
+<div class="action-bar">
+    <a href="/us" class="btn btn-secondary">US</a>
+    <a href="/ca" class="btn btn-secondary">CA</a>
+    <a href="/fi" class="btn btn-secondary">FI</a>
+    <a href="/row" class="btn btn-secondary">ROW</a>
+</div>
+{% endblock %}

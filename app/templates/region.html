@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}{{ region_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header region-header">
+    <div class="region-emoji">{{ region_emoji }}</div>
+    <div class="big-label">{{ region_code }}</div>
+    <h1>{{ region_name }}</h1>
+    <p class="subtitle">Region-specific landing page</p>
+</div>
+
+<div class="card highlight-card">
+    <h2>You Landed Here</h2>
+    <p>This is the <strong>{{ region_name }}</strong> region page. If you were redirected here by a Cloudflare rule, it detected your location as <code>{{ region_code }}</code>.</p>
+
+    <div class="debug-table">
+        <div class="debug-row">
+            <span class="debug-label">Expected Region</span>
+            <span class="debug-value highlight">{{ region_code }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Your Detected Country</span>
+            <span class="debug-value">{{ ctx.country }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Match?</span>
+            <span class="debug-value">{% if ctx.country == region_code or (region_code == 'ROW' and ctx.country not in ['US', 'CA', 'FI']) %}✅ Yes{% else %}❌ No (manual visit or rule misconfigured){% endif %}</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Request Details</h2>
+    <div class="debug-table">
+        <div class="debug-row">
+            <span class="debug-label">Client IP</span>
+            <span class="debug-value">{{ ctx.client_ip }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">City</span>
+            <span class="debug-value">{{ ctx.city }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">CF-Ray</span>
+            <span class="debug-value mono">{{ ctx.cf_ray }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="action-bar">
+    <a href="/geo-redirect" class="btn btn-primary">← Back to Geo Lab</a>
+    <a href="/debug" class="btn btn-secondary">Full Debug</a>
+</div>
+{% endblock %}

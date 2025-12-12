@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Final Page{% endblock %}
+
+{% block content %}
+<div class="page-header success">
+    <div class="big-label">FINAL PAGE</div>
+    <h1>Redirect Complete</h1>
+    <p class="subtitle">You have been redirected to the final destination</p>
+</div>
+
+<div class="card">
+    <h2>Request Context</h2>
+    <div class="debug-table">
+        <div class="debug-row">
+            <span class="debug-label">Full URL</span>
+            <span class="debug-value mono">{{ ctx.scheme }}://{{ ctx.host }}{{ ctx.path }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Method</span>
+            <span class="debug-value">{{ ctx.method }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Client IP</span>
+            <span class="debug-value">{{ ctx.client_ip }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Country</span>
+            <span class="debug-value highlight">{{ ctx.country }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">CF-Ray</span>
+            <span class="debug-value mono">{{ ctx.cf_ray }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>What to Check</h2>
+    <ul class="tips-list">
+        <li>Did the browser show the redirect in the Network tab?</li>
+        <li>Was the correct status code used (301/302/307/308)?</li>
+        <li>Did the request method change or stay the same?</li>
+        <li>Is the final URL what you expected?</li>
+    </ul>
+</div>
+
+<div class="action-bar">
+    <a href="/redirect-lab" class="btn btn-primary">← Back to Redirect Lab</a>
+    <a href="/debug" class="btn btn-secondary">View Full Debug</a>
+</div>
+{% endblock %}

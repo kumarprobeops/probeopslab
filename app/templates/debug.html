@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Debug{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Request Debug</h1>
+    <p class="subtitle">Sanitized view of your request headers and geo data</p>
+</div>
+
+<div class="card">
+    <h2>Request Info</h2>
+    <div class="debug-table">
+        <div class="debug-row">
+            <span class="debug-label">Method</span>
+            <span class="debug-value">{{ ctx.method }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Scheme</span>
+            <span class="debug-value">{{ ctx.scheme }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Host</span>
+            <span class="debug-value">{{ ctx.host }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Path</span>
+            <span class="debug-value">{{ ctx.path }}</span>
+        </div>
+        {% if ctx.query %}
+        <div class="debug-row">
+            <span class="debug-label">Query</span>
+            <span class="debug-value">{{ ctx.query }}</span>
+        </div>
+        {% endif %}
+        <div class="debug-row">
+            <span class="debug-label">Client IP</span>
+            <span class="debug-value">{{ ctx.client_ip }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Cloudflare Geo Data</h2>
+    <div class="debug-table">
+        <div class="debug-row">
+            <span class="debug-label">Country</span>
+            <span class="debug-value highlight">{{ ctx.country }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">City</span>
+            <span class="debug-value">{{ ctx.city }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Region</span>
+            <span class="debug-value">{{ ctx.region }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">CF-Ray</span>
+            <span class="debug-value mono">{{ ctx.cf_ray }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>All Allowed Headers</h2>
+    <div class="debug-table mono">
+        {% for key, value in ctx.headers.items() %}
+        <div class="debug-row">
+            <span class="debug-label">{{ key }}</span>
+            <span class="debug-value">{{ value }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="info-box">
+    <p><strong>Note:</strong> Only allowlisted headers are displayed. Cookies, authorization, and other sensitive headers are filtered out for security.</p>
+</div>
+{% endblock %}

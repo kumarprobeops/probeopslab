@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Redirect Lab{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Redirect Lab</h1>
+    <p class="subtitle">Test different HTTP redirect status codes</p>
+</div>
+
+<div class="card">
+    <h2>Standard Redirects</h2>
+    <p>Click each link to test the redirect behavior. All redirects lead to <code>/final</code>.</p>
+
+    <div class="redirect-grid">
+        <a href="/r/301" class="redirect-link">
+            <span class="status-code">301</span>
+            <span class="redirect-name">Moved Permanently</span>
+            <span class="redirect-desc">Cacheable, method may change to GET</span>
+        </a>
+
+        <a href="/r/302" class="redirect-link">
+            <span class="status-code">302</span>
+            <span class="redirect-name">Found</span>
+            <span class="redirect-desc">Temporary, method may change to GET</span>
+        </a>
+
+        <a href="/r/307" class="redirect-link">
+            <span class="status-code">307</span>
+            <span class="redirect-name">Temporary Redirect</span>
+            <span class="redirect-desc">Temporary, method preserved</span>
+        </a>
+
+        <a href="/r/308" class="redirect-link">
+            <span class="status-code">308</span>
+            <span class="redirect-name">Permanent Redirect</span>
+            <span class="redirect-desc">Cacheable, method preserved</span>
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Testing Tips</h2>
+    <ul class="tips-list">
+        <li>Use browser DevTools Network tab to see the redirect chain</li>
+        <li>Use <code>curl -I -L</code> to follow redirects and see all headers</li>
+        <li>Test from <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps Terminal</a> in different regions</li>
+        <li>Check if your browser caches 301/308 redirects (clear cache to re-test)</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2>Example curl Commands</h2>
+    <pre class="code-block"><code># Follow redirects and show headers
+curl -I -L https://{{ ctx.host }}/r/301
+
+# Show redirect chain without following
+curl -I https://{{ ctx.host }}/r/301</code></pre>
+</div>
+{% endblock %}

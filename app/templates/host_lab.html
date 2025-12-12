@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Host Lab{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Host Lab</h1>
+    <p class="subtitle">Test www vs apex and HTTP vs HTTPS handling</p>
+</div>
+
+<div class="card highlight-card">
+    <h2>Current Request</h2>
+    <div class="host-display">
+        <div class="host-scheme">{{ ctx.scheme }}://</div>
+        <div class="host-name">{{ ctx.host }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Test Host Variants</h2>
+    <p>Click to test how your setup handles different host variations:</p>
+
+    <div class="host-grid">
+        <a href="https://probeopslab.com/host-lab" class="host-link">
+            <span class="host-label">Apex (HTTPS)</span>
+            <span class="host-url">https://probeopslab.com</span>
+        </a>
+
+        <a href="https://www.probeopslab.com/host-lab" class="host-link">
+            <span class="host-label">WWW (HTTPS)</span>
+            <span class="host-url">https://www.probeopslab.com</span>
+        </a>
+
+        <a href="http://probeopslab.com/host-lab" class="host-link">
+            <span class="host-label">Apex (HTTP)</span>
+            <span class="host-url">http://probeopslab.com</span>
+        </a>
+
+        <a href="http://www.probeopslab.com/host-lab" class="host-link">
+            <span class="host-label">WWW (HTTP)</span>
+            <span class="host-url">http://www.probeopslab.com</span>
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Expected Behaviors</h2>
+    <div class="behavior-table">
+        <div class="behavior-row">
+            <span class="behavior-from">http://</span>
+            <span class="behavior-arrow">→</span>
+            <span class="behavior-to">https://</span>
+            <span class="behavior-note">HTTPS upgrade (301 or Cloudflare Always HTTPS)</span>
+        </div>
+        <div class="behavior-row">
+            <span class="behavior-from">www.</span>
+            <span class="behavior-arrow">→</span>
+            <span class="behavior-to">apex</span>
+            <span class="behavior-note">WWW to apex redirect (301)</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Check With curl</h2>
+    <pre class="code-block"><code># Test HTTP to HTTPS upgrade
+curl -I http://probeopslab.com/host-lab
+
+# Test www to apex redirect
+curl -I https://www.probeopslab.com/host-lab
+
+# Follow all redirects
+curl -I -L http://www.probeopslab.com/host-lab</code></pre>
+</div>
+
+<div class="action-bar">
+    <a href="/" class="btn btn-primary">← Back to Home</a>
+    <a href="/debug" class="btn btn-secondary">View Debug</a>
+</div>
+{% endblock %}

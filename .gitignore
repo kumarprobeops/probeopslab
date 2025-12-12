@@ -1,0 +1,43 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml
+
+# Certificates (managed by certbot)
+certbot/conf/
+certbot/www/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SSL certificates and keys (never commit these)
+cloudflare/
+*.pem
+*.key
+
+# Internal/private files (never commit)
+CLAUDE.md
+pdocs/
+progress/
+.claude/

@@ -1,0 +1,52 @@
+# Production Docker Compose configuration
+# Usage: docker compose -f docker-compose.yml up -d
+
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: cf-demo-app
+    restart: unless-stopped
+    expose:
+      - "8000"
+    networks:
+      - cf-demo-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
+    container_name: cf-demo-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/snippets:/etc/nginx/snippets:ro
+      - ./cloudflare:/etc/nginx/cloudflare:ro
+      - ./certbot/www:/var/www/certbot:ro
+    depends_on:
+      - app
+    networks:
+      - cf-demo-network
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    build:
+      context: ./certbot
+      dockerfile: Dockerfile
+    container_name: cf-demo-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    networks:
+      - cf-demo-network
+
+networks:
+  cf-demo-network:
+    driver: bridge
