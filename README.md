@@ -1,15 +1,16 @@
 # ProbeOps Lab
 
-A self-hosted test lab for debugging CDN behavior, redirects, caching, and geo-routing. Deploy it in your infrastructure and get predictable, controllable endpoints for testing.
+A self-hosted test lab for debugging redirects, caching, timeouts, and HTTP headers. Like httpbin, but focused on CDN/edge behavior.
 
-## Why Self-Host?
+## Quick Start
 
-- **Test against your own infrastructure** - Debug issues in internal networks, staging environments, or behind corporate firewalls
-- **No external dependencies** - Run tests in CI/CD pipelines without hitting external services
-- **Customize for your needs** - Add endpoints specific to your testing scenarios
-- **Full control** - No rate limits, no third-party dependencies, no surprises
+**Option 1: Use the hosted instance** (zero setup)
 
-## Quick Start (Local Development)
+```bash
+curl -s https://probeopslab.com/debug.json | jq '{ip: .client_ip, country: .country}'
+```
+
+**Option 2: Self-host** (for internal networks, CI/CD, or reproducing production behavior)
 
 ```bash
 git clone https://github.com/kumarprobeops/probeopslab.git
@@ -17,9 +18,14 @@ cd probeopslab
 docker compose up -d
 ```
 
-Open http://localhost:8000 - you're running.
+Open http://localhost:8000 - done.
 
-The dev setup runs HTTP-only with hot-reload enabled. Edit files in `app/` and changes apply immediately.
+## Why Self-Host?
+
+- **Test against your own infrastructure** - Debug issues in internal networks, staging environments, or behind corporate firewalls
+- **No external dependencies** - Run tests in CI/CD pipelines without hitting external services
+- **Reproduce production behavior** - Run it behind your own LB/WAF/CDN to test real header/redirect/cache behavior
+- **Full control** - No rate limits, no third-party dependencies, no surprises
 
 ## Endpoints
 
@@ -33,6 +39,13 @@ The dev setup runs HTTP-only with hot-reload enabled. Edit files in `app/` and c
 | `/size/{bytes}` | Return N-byte response body |
 | `/cache/*` | Various Cache-Control header configurations |
 | `/use-cases` | Real-world troubleshooting scenarios |
+
+## Architecture
+
+| Mode | Access | Use Case |
+|------|--------|----------|
+| Development | `localhost:8000` (app direct) | Local testing, hot-reload |
+| Production | `:80/:443` (nginx → app) | SSL termination, rate limiting |
 
 ## Production Deployment
 
@@ -67,16 +80,17 @@ curl http://yourdomain.com/debug
 
 ### Step 3: Get SSL Certificate (Let's Encrypt)
 
-Once HTTP is working, issue a certificate:
+Once HTTP is working, use the init script:
 
 ```bash
-# Create certificate directory
+./certbot/scripts/init-cert.sh
+```
+
+Or manually:
+
+```bash
 mkdir -p certbot/www
-
-# Start production stack (will fail SSL initially, that's expected)
 docker compose -f docker-compose.yml up -d nginx app
-
-# Issue certificate
 docker compose run --rm certbot certonly \
     --webroot \
     --webroot-path=/var/www/certbot \
@@ -85,8 +99,6 @@ docker compose run --rm certbot certonly \
     --no-eff-email \
     -d yourdomain.com \
     -d www.yourdomain.com
-
-# Reload nginx to pick up the new certificate
 docker compose exec nginx nginx -s reload
 ```
 
@@ -95,8 +107,6 @@ docker compose exec nginx nginx -s reload
 ```bash
 curl -I https://yourdomain.com/debug
 ```
-
-You should see a 200 response with valid SSL.
 
 ### Certificate Auto-Renewal
 
@@ -127,21 +137,21 @@ Cloudflare Origin Certificates are free, valid for 15 years, and simpler to mana
 
 ```bash
 mkdir -p cloudflare
-# Paste certificate content
-nano cloudflare/fullchain.pem
-# Paste private key content
-nano cloudflare/privkey.pem
+nano cloudflare/fullchain.pem   # Paste certificate
+nano cloudflare/privkey.pem     # Paste private key
 ```
 
-4. Update `nginx/snippets/ssl.conf` to use Cloudflare certs:
+4. The `cloudflare/` directory is already mounted into nginx at `/etc/nginx/cloudflare/` (see docker-compose.yml)
+
+5. Update `nginx/snippets/ssl.conf` to use Cloudflare certs:
 
 ```nginx
 ssl_certificate /etc/nginx/cloudflare/fullchain.pem;
 ssl_certificate_key /etc/nginx/cloudflare/privkey.pem;
 ```
 
-5. In Cloudflare dashboard: SSL/TLS > Overview > Set to "Full (strict)"
-6. Enable orange cloud (proxy) on DNS records
+6. In Cloudflare dashboard: SSL/TLS > Overview > Set to "Full (strict)"
+7. Enable orange cloud (proxy) on DNS records
 
 ### Cloudflare Headers
 
@@ -152,7 +162,17 @@ When proxied through Cloudflare, your `/debug` endpoint will show additional hea
 - `cf-connecting-ip` - Visitor's real IP
 - `cf-ipcity`, `cf-region` - Geo data (Business/Enterprise plans)
 
-These are useful for testing geo-routing rules.
+## Security & Privacy
+
+This is a stateless debugging tool with minimal attack surface:
+
+- **No cookies or sessions** - Each request is independent
+- **No data storage** - Nothing is persisted, no database
+- **Header allowlist** - `/debug` only exposes safe headers (host, user-agent, geo headers). Auth headers, cookies, and tokens are never shown.
+- **Rate limiting** - Default 10 req/s per IP (burst 20) in production nginx config
+- **No tracking** - No analytics, no third-party scripts
+
+Safe to run in corporate networks.
 
 ## Project Structure
 
@@ -237,10 +257,6 @@ docker compose exec nginx nginx -t
 **Cloudflare shows 525/526 errors**
 - SSL mode should be "Full (strict)" not "Flexible"
 - Certificate must be valid (Let's Encrypt or Origin CA)
-
-## Public Instance
-
-Don't want to self-host? We run a public instance at **https://probeopslab.com** for quick tests.
 
 ## Contributing
 
