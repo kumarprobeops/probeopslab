@@ -12,6 +12,10 @@
     <h2>Cache Test Endpoints</h2>
     <p>Each endpoint returns JSON with the specified <code>Cache-Control</code> header. Use these to verify how your CDN or proxy handles caching directives.</p>
 
+    <div class="info-box">
+        <p><strong>Note:</strong> These endpoints return raw JSON responses for programmatic testing. The <code>generated_at</code> timestamp lets you verify if a response was served from cache (same timestamp = cache hit).</p>
+    </div>
+
     <div class="cache-grid">
         <a href="/cache/public-short" class="cache-link" target="_blank">
             <span class="cache-name">public-short</span>

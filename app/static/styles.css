@@ -195,6 +195,21 @@ code {
     font-size: 1.125rem;
 }
 
+.powered-by {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.25rem 0.75rem;
+    background: var(--bg-gray);
+    border: 1px solid var(--border-color);
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
 .big-label {
     display: inline-block;
     background: var(--primary-blue);
@@ -241,9 +256,21 @@ code {
 /* Card Grid */
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .card-grid .card {

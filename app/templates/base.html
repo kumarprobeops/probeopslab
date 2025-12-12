@@ -4,20 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>{% block title %}CF Demo Labs{% endblock %} | ProbeOps</title>
+    <title>{% block title %}CDN & Edge Testing Lab{% endblock %} | ProbeOps</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css?v=2">
+    <link rel="stylesheet" href="/static/styles.css?v=6">
 </head>
 <body>
     <header class="header">
         <div class="container">
-            <a href="/" class="logo">ProbeOps <span class="logo-sub">Demo Lab</span></a>
+            <a href="/" class="logo">ProbeOps <span class="logo-sub">Lab</span></a>
             <nav class="nav">
+                <a href="/">Home</a>
                 <a href="/debug">Debug</a>
+                <a href="/cache">Cache</a>
                 <a href="/redirect-lab">Redirects</a>
                 <a href="/geo-redirect">Geo</a>
+                <a href="/tools">Tools</a>
             </nav>
         </div>
     </header>
@@ -30,7 +33,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>Demo site for tutorials only. <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps</a></p>
+            <p>Public reference test lab. No cookies, no tracking, allowlisted headers only. <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps</a></p>
             <p class="footer-meta">Request ID: {{ ctx.request_id }} | {{ ctx.timestamp }}</p>
         </div>
     </footer>

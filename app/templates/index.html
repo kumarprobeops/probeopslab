@@ -4,40 +4,99 @@
 
 {% block content %}
 <div class="hero">
-    <h1>Cloudflare Demo Labs</h1>
-    <p class="subtitle">Test redirect rules, geo-routing, and request headers</p>
+    <h1>CDN & Edge Testing Lab</h1>
+    <p class="subtitle">A stable reference site for debugging redirects, caching, geo-routing, and request headers</p>
+    <p class="powered-by">Running on Cloudflare Edge</p>
 </div>
 
 <div class="card-grid">
     <a href="/debug" class="card">
         <div class="card-icon">🔍</div>
         <h2>Debug</h2>
-        <p>View sanitized request headers, geo data, and Cloudflare info</p>
+        <p>View request headers, geo data, and CDN info</p>
+    </a>
+
+    <a href="/cache" class="card">
+        <div class="card-icon">💾</div>
+        <h2>Cache Lab</h2>
+        <p>Test Cache-Control headers and caching behavior</p>
     </a>
 
     <a href="/redirect-lab" class="card">
         <div class="card-icon">↪️</div>
         <h2>Redirect Lab</h2>
-        <p>Test 301, 302, 307, 308 redirects and observe behavior</p>
+        <p>Test 301, 302, 307, 308 redirects</p>
+    </a>
+
+    <a href="/tools" class="card">
+        <div class="card-icon">🛠️</div>
+        <h2>Utility Tools</h2>
+        <p>Delay, status codes, and response size testing</p>
     </a>
 
     <a href="/geo-redirect" class="card">
         <div class="card-icon">🌍</div>
         <h2>Geo Routing</h2>
-        <p>Test Cloudflare geo-based redirects by country</p>
+        <p>Test geo-based redirects by country</p>
     </a>
 
     <a href="/host-lab" class="card">
         <div class="card-icon">🔗</div>
         <h2>Host Lab</h2>
-        <p>Test www vs apex and HTTP vs HTTPS handling</p>
+        <p>Test www vs apex and HTTP vs HTTPS</p>
     </a>
 </div>
 
-<section class="info-section">
-    <h2>About This Site</h2>
-    <p>This demo lab is designed for Cloudflare tutorials and testing. Use it with <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps Horizon</a> to validate behaviors from multiple geographic locations.</p>
+<div class="card">
+    <h2>Who Its For</h2>
+    <div class="cache-grid" style="margin-top: 1rem;">
+        <div class="info-box" style="margin: 0;">
+            <p><strong>DevOps Engineers</strong> - Test CDN configs, caching rules, and pipelines</p>
+        </div>
+        <div class="info-box" style="margin: 0;">
+            <p><strong>SRE Teams</strong> - Validate timeout handling, error responses, failover</p>
+        </div>
+        <div class="info-box" style="margin: 0;">
+            <p><strong>CDN Engineers</strong> - Debug cache headers, geo-routing, edge behavior</p>
+        </div>
+        <div class="info-box" style="margin: 0;">
+            <p><strong>Security Engineers</strong> - Test redirect chains, headers, WAF rules</p>
+        </div>
+    </div>
+</div>
 
+<div class="card">
+    <h2>Guarantees</h2>
+    <ul class="tips-list">
+        <li><strong>No cookies</strong> - We do not set any cookies or track sessions</li>
+        <li><strong>No auth required</strong> - All endpoints are publicly accessible</li>
+        <li><strong>No tracking</strong> - No analytics, no logging of request content</li>
+        <li><strong>Stable paths</strong> - URLs will not change, safe for scripts and CI/CD</li>
+        <li><strong>JSON responses</strong> - Programmatic endpoints return pretty-printed JSON</li>
+        <li><strong>Vendor neutral</strong> - Works with any CDN (Cloudflare, Akamai, Fastly, CloudFront)</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2>Quick Start</h2>
+    <pre class="code-block"><code># Check your IP and geo info (JSON)
+curl -s https://{{ ctx.host }}/debug.json
+
+# See request + response headers
+curl -sD - https://{{ ctx.host }}/echo
+
+# Test cache behavior (hit twice, compare timestamps)
+curl -s https://{{ ctx.host }}/cache/public-short
+
+# Get a 503 Service Unavailable response
+curl -sI https://{{ ctx.host }}/status/503 | head -1
+
+# Test with 2 second delay
+curl -w "Time: %{time_total}s\n" https://{{ ctx.host }}/delay/2000</code></pre>
+</div>
+
+<section class="info-section">
+    <h2>Your Request</h2>
     <div class="debug-mini">
         <div class="debug-row">
             <span class="debug-label">Your IP:</span>
@@ -48,7 +107,7 @@
             <span class="debug-value">{{ ctx.country }}</span>
         </div>
         <div class="debug-row">
-            <span class="debug-label">CF-Ray:</span>
+            <span class="debug-label">Edge:</span>
             <span class="debug-value">{{ ctx.cf_ray }}</span>
         </div>
     </div>

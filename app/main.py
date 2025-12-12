@@ -3,11 +3,13 @@ ProbeOps Lab - CDN/DevOps Testing Utility
 https://probeopslab.com
 """
 
+import asyncio
 import hashlib
+import json
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, Path
 from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -19,11 +21,11 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Allowed headers for /debug endpoint (security: no cookies/auth)
+# Note: x-real-ip removed as it shows Cloudflare edge IP, not user IP (confusing)
 ALLOWED_HEADERS = [
     "host",
     "x-forwarded-for",
     "x-forwarded-proto",
-    "x-real-ip",
     "cf-ray",
     "cf-ipcountry",
     "cf-ipcity",
@@ -101,6 +103,69 @@ async def debug(request: Request):
     return templates.TemplateResponse("debug.html", {"request": request, "ctx": ctx})
 
 
+@app.get("/debug.json")
+async def debug_json(request: Request):
+    """JSON version of debug info for programmatic/CLI access."""
+    ctx = get_request_context(request)
+    json_ctx = {
+        "client_ip": ctx["client_ip"],
+        "country": ctx["country"],
+        "city": ctx["city"],
+        "region": ctx["region"],
+        "method": ctx["method"],
+        "scheme": ctx["scheme"],
+        "host": ctx["host"],
+        "path": ctx["path"],
+        "query": ctx["query"],
+        "headers": ctx["headers"],
+        "cf_ray": ctx["cf_ray"],
+        "timestamp": ctx["timestamp"],
+        "request_id": ctx["request_id"],
+    }
+    return Response(
+        content=json.dumps(json_ctx, indent=2),
+        media_type="application/json"
+    )
+
+
+@app.get("/echo")
+async def echo_endpoint(request: Request):
+    """Echo endpoint showing request info with useful response headers."""
+    ctx = get_request_context(request)
+
+    body = {
+        "request": {
+            "client_ip": ctx["client_ip"],
+            "country": ctx["country"],
+            "method": ctx["method"],
+            "scheme": ctx["scheme"],
+            "host": ctx["host"],
+            "path": ctx["path"],
+            "headers": ctx["headers"],
+        },
+        "response_headers": {
+            "note": "Check response headers with: curl -sI or curl -sD -",
+            "headers_included": [
+                "X-Request-Id",
+                "X-Client-IP",
+                "X-Country",
+                "X-Served-By",
+            ]
+        },
+        "timestamp": ctx["timestamp"],
+    }
+
+    response = Response(
+        content=json.dumps(body, indent=2),
+        media_type="application/json"
+    )
+    response.headers["X-Request-Id"] = ctx["request_id"]
+    response.headers["X-Client-IP"] = ctx["client_ip"]
+    response.headers["X-Country"] = ctx["country"]
+    response.headers["X-Served-By"] = "probeopslab"
+    return response
+
+
 @app.get("/robots.txt", response_class=PlainTextResponse)
 async def robots():
     """Disallow all indexing for demo site."""
@@ -124,7 +189,10 @@ def create_cache_response(path: str, cache_control: str, description: str) -> Re
     now = datetime.now(timezone.utc)
     body = {"path": path, "generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "cache_control": cache_control, "description": description}
     etag = hashlib.md5(str(body).encode()).hexdigest()[:16]
-    response = JSONResponse(content=body)
+    response = Response(
+        content=json.dumps(body, indent=2),
+        media_type="application/json"
+    )
     response.headers["Cache-Control"] = cache_control
     response.headers["ETag"] = f'"{etag}"'
     response.headers["Last-Modified"] = now.strftime("%a, %d %b %Y %H:%M:%S GMT")
@@ -318,4 +386,143 @@ async def host_lab(request: Request):
     ctx = get_request_context(request)
     return templates.TemplateResponse(
         "host_lab.html", {"request": request, "ctx": ctx}
+    )
+
+
+# =============================================================================
+# Utility Labs (Timing, Status, Size)
+# =============================================================================
+
+# Allowed status codes for /status endpoint
+ALLOWED_STATUS_CODES = [200, 201, 204, 400, 401, 403, 404, 405, 408, 429, 500, 502, 503, 504]
+
+
+@app.get("/tools", response_class=HTMLResponse)
+async def tools_lab(request: Request):
+    """Utility tools lab index page."""
+    ctx = get_request_context(request)
+    return templates.TemplateResponse("tools_lab.html", {"request": request, "ctx": ctx})
+
+
+@app.get("/delay/{ms}")
+async def delay_endpoint(ms: int = Path(..., ge=0, le=10000)):
+    """Return response after specified delay in milliseconds (max 10000ms)."""
+    start_time = datetime.now(timezone.utc)
+    await asyncio.sleep(ms / 1000)
+    end_time = datetime.now(timezone.utc)
+
+    body = {
+        "path": f"/delay/{ms}",
+        "requested_delay_ms": ms,
+        "actual_delay_ms": round((end_time - start_time).total_seconds() * 1000),
+        "started_at": start_time.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+        "completed_at": end_time.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+    }
+    return Response(
+        content=json.dumps(body, indent=2),
+        media_type="application/json"
+    )
+
+
+@app.get("/status/{code}")
+async def status_endpoint(code: int = Path(...)):
+    """Return specified HTTP status code."""
+    if code not in ALLOWED_STATUS_CODES:
+        body = {
+            "error": "Invalid status code",
+            "requested_code": code,
+            "allowed_codes": ALLOWED_STATUS_CODES,
+        }
+        return Response(
+            content=json.dumps(body, indent=2),
+            media_type="application/json",
+            status_code=400
+        )
+
+    # Status code descriptions
+    descriptions = {
+        200: "OK",
+        201: "Created",
+        204: "No Content",
+        400: "Bad Request",
+        401: "Unauthorized",
+        403: "Forbidden",
+        404: "Not Found",
+        405: "Method Not Allowed",
+        408: "Request Timeout",
+        429: "Too Many Requests",
+        500: "Internal Server Error",
+        502: "Bad Gateway",
+        503: "Service Unavailable",
+        504: "Gateway Timeout",
+    }
+
+    body = {
+        "path": f"/status/{code}",
+        "status_code": code,
+        "status_text": descriptions.get(code, "Unknown"),
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
+
+    # 204 No Content should not have a body
+    if code == 204:
+        return Response(status_code=204)
+
+    return Response(
+        content=json.dumps(body, indent=2),
+        media_type="application/json",
+        status_code=code
+    )
+
+
+@app.get("/size/{bytes}.json")
+async def size_json_endpoint(bytes: int = Path(..., ge=0, le=1048576)):
+    """Return metadata about what /size/{bytes} would return (no binary payload)."""
+    body = {
+        "path": f"/size/{bytes}",
+        "requested_bytes": bytes,
+        "actual_endpoint": f"/size/{bytes}",
+        "content_type": "application/octet-stream",
+        "description": f"Use GET /size/{bytes} to receive a {bytes}-byte binary response",
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
+    return Response(
+        content=json.dumps(body, indent=2),
+        media_type="application/json"
+    )
+
+
+@app.get("/size/{bytes}")
+async def size_endpoint(bytes: int = Path(..., ge=0, le=1048576)):
+    """Return response of specified size in bytes (max 1MB = 1048576 bytes)."""
+    # Create JSON header
+    header = {
+        "path": f"/size/{bytes}",
+        "requested_bytes": bytes,
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
+    header_json = json.dumps(header, indent=2)
+    header_size = len(header_json.encode('utf-8'))
+
+    # Calculate padding needed
+    if bytes <= header_size:
+        # If requested size is smaller than header, just return header
+        content = header_json
+    else:
+        # Add padding to reach requested size
+        padding_needed = bytes - header_size - 2  # -2 for newline and closing
+        padding = "X" * max(0, padding_needed)
+        content = header_json[:-1] + f',\n  "padding": "{padding}"\n}}'
+
+    # Trim or pad to exact size
+    content_bytes = content.encode('utf-8')
+    if len(content_bytes) < bytes:
+        content = content + "X" * (bytes - len(content_bytes))
+    elif len(content_bytes) > bytes:
+        content = content_bytes[:bytes].decode('utf-8', errors='ignore')
+
+    return Response(
+        content=content,
+        media_type="application/octet-stream",
+        headers={"Content-Length": str(bytes)}
     )

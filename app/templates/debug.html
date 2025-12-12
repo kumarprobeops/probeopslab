@@ -5,7 +5,17 @@
 {% block content %}
 <div class="page-header">
     <h1>Request Debug</h1>
-    <p class="subtitle">Sanitized view of your request headers and geo data</p>
+    <p class="subtitle">See how your request appears to a CDN edge</p>
+</div>
+
+<div class="info-box" style="margin-bottom: 1.5rem;">
+    <p><strong>Note:</strong> This site runs behind Cloudflare with a minimal, fixed configuration. You cannot test your own CDN rules here.</p>
+    <p style="margin-top: 0.5rem; margin-bottom: 0;">Use this to:</p>
+    <ul class="tips-list" style="margin-top: 0.5rem;">
+        <li>See how your network/proxy/VPN appears to a CDN edge</li>
+        <li>Validate IP and geo detection from a neutral reference</li>
+        <li>Inspect request headers exactly as received by the origin</li>
+    </ul>
 </div>
 
 <div class="card">
@@ -33,16 +43,16 @@
             <span class="debug-value">{{ ctx.query }}</span>
         </div>
         {% endif %}
-        <div class="debug-row">
-            <span class="debug-label">Client IP</span>
-            <span class="debug-value">{{ ctx.client_ip }}</span>
-        </div>
     </div>
 </div>
 
 <div class="card">
-    <h2>Cloudflare Geo Data</h2>
+    <h2>Client Identity</h2>
     <div class="debug-table">
+        <div class="debug-row">
+            <span class="debug-label">Client IP</span>
+            <span class="debug-value highlight">{{ ctx.client_ip }}</span>
+        </div>
         <div class="debug-row">
             <span class="debug-label">Country</span>
             <span class="debug-value highlight">{{ ctx.country }}</span>
@@ -55,26 +65,40 @@
             <span class="debug-label">Region</span>
             <span class="debug-value">{{ ctx.region }}</span>
         </div>
-        <div class="debug-row">
-            <span class="debug-label">CF-Ray</span>
-            <span class="debug-value mono">{{ ctx.cf_ray }}</span>
-        </div>
     </div>
 </div>
 
 <div class="card">
-    <h2>All Allowed Headers</h2>
+    <h2>Standard HTTP Headers</h2>
+    <p class="text-muted" style="margin-bottom: 1rem; font-size: 0.875rem;">Common headers seen by any origin server behind a reverse proxy</p>
     <div class="debug-table mono">
         {% for key, value in ctx.headers.items() %}
+        {% if key in ['host', 'x-forwarded-for', 'x-forwarded-proto', 'user-agent', 'accept-language', 'accept-encoding'] %}
         <div class="debug-row">
             <span class="debug-label">{{ key }}</span>
             <span class="debug-value">{{ value }}</span>
         </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card">
+    <h2>Cloudflare Headers</h2>
+    <p class="text-muted" style="margin-bottom: 1rem; font-size: 0.875rem;">Headers added by Cloudflare edge (this site's CDN)</p>
+    <div class="debug-table mono">
+        {% for key, value in ctx.headers.items() %}
+        {% if key.startswith('cf-') %}
+        <div class="debug-row">
+            <span class="debug-label">{{ key }}</span>
+            <span class="debug-value">{{ value }}</span>
+        </div>
+        {% endif %}
         {% endfor %}
     </div>
 </div>
 
 <div class="info-box">
-    <p><strong>Note:</strong> Only allowlisted headers are displayed. Cookies, authorization, and other sensitive headers are filtered out for security.</p>
+    <p><strong>Security:</strong> Only allowlisted headers are displayed. Cookies, authorization, and other sensitive headers are filtered out.</p>
 </div>
 {% endblock %}

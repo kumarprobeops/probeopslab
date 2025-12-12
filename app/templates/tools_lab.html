@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Utility Tools{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Utility Tools</h1>
+    <p class="subtitle">Response timing, status codes, and payload size testing</p>
+</div>
+
+<div class="card">
+    <h2>Response Delay</h2>
+    <p>Test timeout handling and async behavior with configurable response delays.</p>
+
+    <div class="info-box">
+        <p><strong>Endpoint:</strong> <code>/delay/{ms}</code> - Returns after specified milliseconds (max 10,000ms)</p>
+    </div>
+
+    <div class="cache-grid">
+        <a href="/delay/0" class="cache-link" target="_blank">
+            <span class="cache-name">/delay/0</span>
+            <span class="cache-header">Instant</span>
+            <span class="cache-desc">No delay, immediate response</span>
+        </a>
+        <a href="/delay/500" class="cache-link" target="_blank">
+            <span class="cache-name">/delay/500</span>
+            <span class="cache-header">500ms</span>
+            <span class="cache-desc">Half second delay</span>
+        </a>
+        <a href="/delay/1000" class="cache-link" target="_blank">
+            <span class="cache-name">/delay/1000</span>
+            <span class="cache-header">1 second</span>
+            <span class="cache-desc">One second delay</span>
+        </a>
+        <a href="/delay/5000" class="cache-link" target="_blank">
+            <span class="cache-name">/delay/5000</span>
+            <span class="cache-header">5 seconds</span>
+            <span class="cache-desc">Five second delay</span>
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>HTTP Status Codes</h2>
+    <p>Test error handling with specific HTTP status code responses.</p>
+
+    <div class="info-box">
+        <p><strong>Endpoint:</strong> <code>/status/{code}</code> - Returns the specified HTTP status code</p>
+    </div>
+
+    <h3 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Success Codes</h3>
+    <div class="cache-grid">
+        <a href="/status/200" class="cache-link" target="_blank">
+            <span class="cache-name">/status/200</span>
+            <span class="cache-header">200 OK</span>
+            <span class="cache-desc">Successful request</span>
+        </a>
+        <a href="/status/201" class="cache-link" target="_blank">
+            <span class="cache-name">/status/201</span>
+            <span class="cache-header">201 Created</span>
+            <span class="cache-desc">Resource created</span>
+        </a>
+        <a href="/status/204" class="cache-link" target="_blank">
+            <span class="cache-name">/status/204</span>
+            <span class="cache-header">204 No Content</span>
+            <span class="cache-desc">Success, no body</span>
+        </a>
+    </div>
+
+    <h3 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Client Error Codes</h3>
+    <div class="cache-grid">
+        <a href="/status/400" class="cache-link" target="_blank">
+            <span class="cache-name">/status/400</span>
+            <span class="cache-header">400 Bad Request</span>
+            <span class="cache-desc">Invalid request</span>
+        </a>
+        <a href="/status/401" class="cache-link" target="_blank">
+            <span class="cache-name">/status/401</span>
+            <span class="cache-header">401 Unauthorized</span>
+            <span class="cache-desc">Auth required</span>
+        </a>
+        <a href="/status/403" class="cache-link" target="_blank">
+            <span class="cache-name">/status/403</span>
+            <span class="cache-header">403 Forbidden</span>
+            <span class="cache-desc">Access denied</span>
+        </a>
+        <a href="/status/404" class="cache-link" target="_blank">
+            <span class="cache-name">/status/404</span>
+            <span class="cache-header">404 Not Found</span>
+            <span class="cache-desc">Resource not found</span>
+        </a>
+        <a href="/status/429" class="cache-link" target="_blank">
+            <span class="cache-name">/status/429</span>
+            <span class="cache-header">429 Too Many</span>
+            <span class="cache-desc">Rate limited</span>
+        </a>
+    </div>
+
+    <h3 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Server Error Codes</h3>
+    <div class="cache-grid">
+        <a href="/status/500" class="cache-link" target="_blank">
+            <span class="cache-name">/status/500</span>
+            <span class="cache-header">500 Server Error</span>
+            <span class="cache-desc">Internal error</span>
+        </a>
+        <a href="/status/502" class="cache-link" target="_blank">
+            <span class="cache-name">/status/502</span>
+            <span class="cache-header">502 Bad Gateway</span>
+            <span class="cache-desc">Upstream error</span>
+        </a>
+        <a href="/status/503" class="cache-link" target="_blank">
+            <span class="cache-name">/status/503</span>
+            <span class="cache-header">503 Unavailable</span>
+            <span class="cache-desc">Service down</span>
+        </a>
+        <a href="/status/504" class="cache-link" target="_blank">
+            <span class="cache-name">/status/504</span>
+            <span class="cache-header">504 Timeout</span>
+            <span class="cache-desc">Gateway timeout</span>
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Response Size</h2>
+    <p>Test transfer speeds and compression with configurable response sizes.</p>
+
+    <div class="info-box">
+        <p><strong>Endpoint:</strong> <code>/size/{bytes}</code> - Returns response of specified size (max 1MB)</p>
+    </div>
+
+    <div class="cache-grid">
+        <a href="/size/100" class="cache-link" target="_blank">
+            <span class="cache-name">/size/100</span>
+            <span class="cache-header">100 B</span>
+            <span class="cache-desc">Tiny response</span>
+        </a>
+        <a href="/size/1024" class="cache-link" target="_blank">
+            <span class="cache-name">/size/1024</span>
+            <span class="cache-header">1 KB</span>
+            <span class="cache-desc">Small response</span>
+        </a>
+        <a href="/size/10240" class="cache-link" target="_blank">
+            <span class="cache-name">/size/10240</span>
+            <span class="cache-header">10 KB</span>
+            <span class="cache-desc">Medium response</span>
+        </a>
+        <a href="/size/102400" class="cache-link" target="_blank">
+            <span class="cache-name">/size/102400</span>
+            <span class="cache-header">100 KB</span>
+            <span class="cache-desc">Large response</span>
+        </a>
+        <a href="/size/1048576" class="cache-link" target="_blank">
+            <span class="cache-name">/size/1048576</span>
+            <span class="cache-header">1 MB</span>
+            <span class="cache-desc">Maximum size</span>
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Example curl Commands</h2>
+    <pre class="code-block"><code># Test 2 second delay
+curl -w "Total time: %{time_total}s\n" https://{{ ctx.host }}/delay/2000
+
+# Get 503 Service Unavailable
+curl -sI https://{{ ctx.host }}/status/503 | head -1
+
+# Download 100KB and measure speed
+curl -o /dev/null -w "Speed: %{speed_download} bytes/sec\n" https://{{ ctx.host }}/size/102400
+
+# Test timeout handling (will timeout if client timeout < 10s)
+curl --max-time 5 https://{{ ctx.host }}/delay/10000</code></pre>
+</div>
+{% endblock %}
