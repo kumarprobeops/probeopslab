@@ -207,49 +207,49 @@ def create_cache_response(path: str, cache_control: str, description: str) -> Re
     return response
 
 
-@app.get("/cache/public-short")
+@app.api_route("/cache/public-short", methods=["GET", "HEAD"])
 async def cache_public_short():
     c = CACHE_CONFIGS["public-short"]
     return create_cache_response("/cache/public-short", c["cache_control"], c["description"])
 
 
-@app.get("/cache/public-long")
+@app.api_route("/cache/public-long", methods=["GET", "HEAD"])
 async def cache_public_long():
     c = CACHE_CONFIGS["public-long"]
     return create_cache_response("/cache/public-long", c["cache_control"], c["description"])
 
 
-@app.get("/cache/no-store")
+@app.api_route("/cache/no-store", methods=["GET", "HEAD"])
 async def cache_no_store():
     c = CACHE_CONFIGS["no-store"]
     return create_cache_response("/cache/no-store", c["cache_control"], c["description"])
 
 
-@app.get("/cache/no-cache")
+@app.api_route("/cache/no-cache", methods=["GET", "HEAD"])
 async def cache_no_cache():
     c = CACHE_CONFIGS["no-cache"]
     return create_cache_response("/cache/no-cache", c["cache_control"], c["description"])
 
 
-@app.get("/cache/private")
+@app.api_route("/cache/private", methods=["GET", "HEAD"])
 async def cache_private():
     c = CACHE_CONFIGS["private"]
     return create_cache_response("/cache/private", c["cache_control"], c["description"])
 
 
-@app.get("/cache/s-maxage")
+@app.api_route("/cache/s-maxage", methods=["GET", "HEAD"])
 async def cache_s_maxage():
     c = CACHE_CONFIGS["s-maxage"]
     return create_cache_response("/cache/s-maxage", c["cache_control"], c["description"])
 
 
-@app.get("/cache/stale-while-revalidate")
+@app.api_route("/cache/stale-while-revalidate", methods=["GET", "HEAD"])
 async def cache_stale_while_revalidate():
     c = CACHE_CONFIGS["stale-while-revalidate"]
     return create_cache_response("/cache/stale-while-revalidate", c["cache_control"], c["description"])
 
 
-@app.get("/cache/immutable")
+@app.api_route("/cache/immutable", methods=["GET", "HEAD"])
 async def cache_immutable():
     c = CACHE_CONFIGS["immutable"]
     return create_cache_response("/cache/immutable", c["cache_control"], c["description"])
@@ -387,7 +387,7 @@ async def region_row(request: Request):
 # =============================================================================
 
 
-@app.get("/host-lab", response_class=HTMLResponse)
+@app.api_route("/host-lab", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def host_lab(request: Request):
     """Host and scheme helper - shows current host and links to variants."""
     ctx = get_request_context(request)
