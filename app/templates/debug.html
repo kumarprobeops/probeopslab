@@ -19,6 +19,28 @@
 </div>
 
 <div class="card">
+    <h2>Client Identity</h2>
+    <div class="debug-table">
+        <div class="debug-row">
+            <span class="debug-label">Client IP</span>
+            <span class="debug-value highlight">{{ ctx.client_ip }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Country</span>
+            <span class="debug-value highlight">{{ ctx.country }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">City</span>
+            <span class="debug-value">{{ ctx.city }}</span>
+        </div>
+        <div class="debug-row">
+            <span class="debug-label">Region</span>
+            <span class="debug-value">{{ ctx.region }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
     <h2>Request Info</h2>
     <div class="debug-table">
         <div class="debug-row">
@@ -43,28 +65,6 @@
             <span class="debug-value">{{ ctx.query }}</span>
         </div>
         {% endif %}
-    </div>
-</div>
-
-<div class="card">
-    <h2>Client Identity</h2>
-    <div class="debug-table">
-        <div class="debug-row">
-            <span class="debug-label">Client IP</span>
-            <span class="debug-value highlight">{{ ctx.client_ip }}</span>
-        </div>
-        <div class="debug-row">
-            <span class="debug-label">Country</span>
-            <span class="debug-value highlight">{{ ctx.country }}</span>
-        </div>
-        <div class="debug-row">
-            <span class="debug-label">City</span>
-            <span class="debug-value">{{ ctx.city }}</span>
-        </div>
-        <div class="debug-row">
-            <span class="debug-label">Region</span>
-            <span class="debug-value">{{ ctx.region }}</span>
-        </div>
     </div>
 </div>
 
