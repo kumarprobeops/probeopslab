@@ -97,17 +97,17 @@
 
 <div class="card">
     <h2>Example curl Commands</h2>
-    <pre class="code-block"><code># Test public-short caching
-curl -s https://{{ ctx.host }}/cache/public-short
+    <pre class="code-block"><code># Test CDN caching with static file (run twice, second should show HIT)
+curl -sI https://{{ ctx.host }}/static/styles.css | grep -i "cf-cache-status"
 
-# Show all response headers
-curl -sD - https://{{ ctx.host }}/cache/public-short
-
-# Test conditional request with ETag
-curl -H "If-None-Match: \"abc123\"" https://{{ ctx.host }}/cache/public-short
+# Show Cache-Control header from origin
+curl -sI https://{{ ctx.host }}/cache/public-short | grep -i "cache-control"
 
 # Compare timestamps (run twice, check if generated_at changes)
-curl -s https://{{ ctx.host }}/cache/public-short | jq .generated_at</code></pre>
+curl -s https://{{ ctx.host }}/cache/public-short | jq .generated_at
+
+# Test conditional request with ETag
+curl -H "If-None-Match: \"abc123\"" https://{{ ctx.host }}/cache/public-short</code></pre>
 </div>
 
 <div class="tip-box">
