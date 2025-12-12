@@ -13,6 +13,7 @@
     <p class="text-muted">You're using a VPN but websites still see your real location.</p>
     <p><strong>Test:</strong> Visit <a href="/debug">/debug</a> and check "Client IP" and "Country". If it shows your real IP instead of the VPN's, your VPN is leaking.</p>
     <pre class="code-block"><code>curl -s https://{{ ctx.host }}/debug.json | jq "{ip: .client_ip, country: .country}"</code></pre>
+    <p class="inline-tip">Verify from multiple locations with <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps</a></p>
 </div>
 
 <div class="card">
@@ -39,6 +40,7 @@ curl -X POST -sI https://{{ ctx.host }}/r/307 | grep -i "HTTP\|location"</code><
     <pre class="code-block"><code># Run twice - second should show HIT
 curl -sI https://{{ ctx.host }}/static/styles.css | grep -i "cf-cache-status"</code></pre>
     <p><strong>If DYNAMIC:</strong> Your CDN isn't caching. Check Cache-Control headers and CDN rules.</p>
+    <p class="inline-tip">Cache status varies by edge location - test from multiple regions with <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps</a></p>
 </div>
 
 <div class="card">
@@ -68,6 +70,7 @@ curl -sI https://{{ ctx.host }}/status/503 | grep "HTTP"</code></pre>
     <pre class="code-block"><code># Find where it breaks
 curl -w "Time: %{time_total}s\n" https://{{ ctx.host }}/delay/5000
 curl -w "Time: %{time_total}s\n" https://{{ ctx.host }}/delay/10000</code></pre>
+    <p class="inline-tip">Test timeout behavior from different regions with <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps</a></p>
 </div>
 
 <div class="card">
@@ -76,6 +79,7 @@ curl -w "Time: %{time_total}s\n" https://{{ ctx.host }}/delay/10000</code></pre>
     <p><strong>Test:</strong> See exactly what headers reach the origin server.</p>
     <pre class="code-block"><code>curl -s https://{{ ctx.host }}/debug.json | jq .headers</code></pre>
     <p><strong>Check:</strong> <a href="/debug">/debug</a> shows all headers received (sensitive ones filtered for security).</p>
+    <p class="inline-tip">Compare headers from different network paths with <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps</a></p>
 </div>
 
 <div class="card">
@@ -87,6 +91,7 @@ curl -o /dev/null -w "Size: %{size_download}, Time: %{time_total}s\n" https://{{
 
 # Test 1MB
 curl -o /dev/null -w "Size: %{size_download}, Time: %{time_total}s\n" https://{{ ctx.host }}/size/1048576</code></pre>
+    <p class="inline-tip">Download speeds vary by region - test globally with <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps</a></p>
 </div>
 
 <div class="card">

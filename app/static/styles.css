@@ -700,6 +700,22 @@ code {
     color: var(--primary-blue);
 }
 
+/* Inline tip - subtle one-liner */
+.inline-tip {
+    margin-top: 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.inline-tip a {
+    color: var(--text-muted);
+    text-decoration: underline;
+}
+
+.inline-tip a:hover {
+    color: var(--primary-blue);
+}
+
 .info-section {
     margin-top: 2rem;
 }
