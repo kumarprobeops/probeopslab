@@ -33,6 +33,7 @@ Open http://localhost:8000 - done.
 |------|-------------|
 | `/debug` | Your IP, geo headers, request info |
 | `/debug.json` | Same as above, JSON format for scripts |
+| `/echo` | Request info + response headers (X-Request-Id, X-Client-IP, etc.) |
 | `/r/301`, `/r/302`, `/r/307`, `/r/308` | Redirect with specific status code |
 | `/status/{code}` | Return specific HTTP status (200, 404, 500, etc.) |
 | `/delay/{ms}` | Respond after N milliseconds |

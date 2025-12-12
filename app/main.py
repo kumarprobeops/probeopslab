@@ -142,7 +142,7 @@ async def debug_json(request: Request):
     )
 
 
-@app.get("/echo")
+@app.api_route("/echo", methods=["GET", "HEAD"])
 async def echo_endpoint(request: Request):
     """Echo endpoint showing request info with useful response headers."""
     ctx = get_request_context(request)
