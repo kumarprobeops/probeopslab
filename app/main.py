@@ -499,7 +499,7 @@ async def size_json_endpoint(bytes: int = Path(..., ge=0, le=1048576)):
     )
 
 
-@app.get("/size/{bytes}")
+@app.api_route("/size/{bytes}", methods=["GET", "HEAD"])
 async def size_endpoint(bytes: int = Path(..., ge=0, le=1048576)):
     """Return response of specified size in bytes (max 1MB = 1048576 bytes)."""
     # Create JSON header
