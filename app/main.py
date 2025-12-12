@@ -103,6 +103,13 @@ async def about(request: Request):
     return templates.TemplateResponse("about.html", {"request": request, "ctx": ctx})
 
 
+@app.get("/use-cases", response_class=HTMLResponse)
+async def use_cases(request: Request):
+    """Use cases - real problems you can troubleshoot with this lab."""
+    ctx = get_request_context(request)
+    return templates.TemplateResponse("use-cases.html", {"request": request, "ctx": ctx})
+
+
 @app.get("/debug", response_class=HTMLResponse)
 async def debug(request: Request):
     """Request and geo debug page - sanitized headers display."""

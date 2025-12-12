@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Use Cases{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Use Cases</h1>
+    <p class="subtitle">Real problems you can troubleshoot with this lab</p>
+</div>
+
+<div class="card">
+    <h2>My VPN/proxy is leaking my real IP</h2>
+    <p class="text-muted">You're using a VPN but websites still see your real location.</p>
+    <p><strong>Test:</strong> Visit <a href="/debug">/debug</a> and check "Client IP" and "Country". If it shows your real IP instead of the VPN's, your VPN is leaking.</p>
+    <pre class="code-block"><code>curl -s https://{{ ctx.host }}/debug.json | jq "{ip: .client_ip, country: .country}"</code></pre>
+</div>
+
+<div class="card">
+    <h2>My SEO rankings dropped after a site migration</h2>
+    <p class="text-muted">You moved pages to new URLs but Google isn't transferring page rank.</p>
+    <p><strong>Test:</strong> Check if you're using 301 (permanent) or 302 (temporary) redirects. Only 301/308 pass SEO value.</p>
+    <pre class="code-block"><code>curl -sI https://your-site.com/old-page | grep -i "HTTP\|location"</code></pre>
+    <p><strong>Compare with:</strong> <a href="/r/301">/r/301</a> (correct for SEO) vs <a href="/r/302">/r/302</a> (wrong for SEO)</p>
+</div>
+
+<div class="card">
+    <h2>My API client isn't following redirects correctly</h2>
+    <p class="text-muted">POST requests lose their body after a redirect, or client doesn't follow at all.</p>
+    <p><strong>Test:</strong> 307/308 preserve the HTTP method, 301/302 may change POST to GET.</p>
+    <pre class="code-block"><code># 307 preserves POST method
+curl -X POST -sI https://{{ ctx.host }}/r/307 | grep -i "HTTP\|location"</code></pre>
+    <p><strong>Compare:</strong> <a href="/r/301">/r/301</a> vs <a href="/r/307">/r/307</a></p>
+</div>
+
+<div class="card">
+    <h2>My CDN isn't caching static assets</h2>
+    <p class="text-muted">Every request hits your origin, even for files that should be cached.</p>
+    <p><strong>Test:</strong> Check cf-cache-status header. Should show HIT on second request.</p>
+    <pre class="code-block"><code># Run twice - second should show HIT
+curl -sI https://{{ ctx.host }}/static/styles.css | grep -i "cf-cache-status"</code></pre>
+    <p><strong>If DYNAMIC:</strong> Your CDN isn't caching. Check Cache-Control headers and CDN rules.</p>
+</div>
+
+<div class="card">
+    <h2>My app crashes when backend is slow</h2>
+    <p class="text-muted">Timeouts, connection pool exhaustion, or UI freezes when upstream is slow.</p>
+    <p><strong>Test:</strong> Simulate a slow backend and see how your client handles it.</p>
+    <pre class="code-block"><code># 3 second delay
+curl -w "Time: %{time_total}s\n" https://{{ ctx.host }}/delay/3000
+
+# Test your timeout (should fail if timeout < 10s)
+curl --max-time 5 https://{{ ctx.host }}/delay/10000</code></pre>
+</div>
+
+<div class="card">
+    <h2>My error pages aren't showing correctly</h2>
+    <p class="text-muted">Custom 404/500 pages not rendering, or wrong error codes returned.</p>
+    <p><strong>Test:</strong> Get specific HTTP status codes to test your error handling.</p>
+    <pre class="code-block"><code>curl -sI https://{{ ctx.host }}/status/404 | grep "HTTP"
+curl -sI https://{{ ctx.host }}/status/503 | grep "HTTP"</code></pre>
+    <p><strong>Available:</strong> 200, 201, 204, 400, 401, 403, 404, 408, 429, 500, 502, 503, 504</p>
+</div>
+
+<div class="card">
+    <h2>My load balancer times out before backend responds</h2>
+    <p class="text-muted">Getting 504 Gateway Timeout even though backend eventually responds.</p>
+    <p><strong>Test:</strong> Find your timeout threshold by testing increasing delays.</p>
+    <pre class="code-block"><code># Find where it breaks
+curl -w "Time: %{time_total}s\n" https://{{ ctx.host }}/delay/5000
+curl -w "Time: %{time_total}s\n" https://{{ ctx.host }}/delay/10000</code></pre>
+</div>
+
+<div class="card">
+    <h2>My proxy is stripping or adding headers</h2>
+    <p class="text-muted">Auth headers disappearing, or unexpected headers being added.</p>
+    <p><strong>Test:</strong> See exactly what headers reach the origin server.</p>
+    <pre class="code-block"><code>curl -s https://{{ ctx.host }}/debug.json | jq .headers</code></pre>
+    <p><strong>Check:</strong> <a href="/debug">/debug</a> shows all headers received (sensitive ones filtered for security).</p>
+</div>
+
+<div class="card">
+    <h2>Large file downloads fail or timeout</h2>
+    <p class="text-muted">Downloads work for small files but fail for large ones.</p>
+    <p><strong>Test:</strong> Request specific payload sizes to find the breaking point.</p>
+    <pre class="code-block"><code># Test 100KB
+curl -o /dev/null -w "Size: %{size_download}, Time: %{time_total}s\n" https://{{ ctx.host }}/size/102400
+
+# Test 1MB
+curl -o /dev/null -w "Size: %{size_download}, Time: %{time_total}s\n" https://{{ ctx.host }}/size/1048576</code></pre>
+</div>
+
+<div class="card">
+    <h2>www and non-www versions are both accessible</h2>
+    <p class="text-muted">Duplicate content issues, or SSL certificate only works on one.</p>
+    <p><strong>Test:</strong> Check that www redirects to apex (or vice versa).</p>
+    <pre class="code-block"><code>curl -sI https://www.{{ ctx.host }} | grep -i "HTTP\|location"</code></pre>
+    <p><strong>Expected:</strong> 301 redirect to https://{{ ctx.host }}</p>
+</div>
+
+<div class="tip-box">
+    <p><strong>Tip:</strong> Need to run these tests from multiple geographic regions? ProbeOps can run from 6+ locations → <a href="https://probeops.com" target="_blank" rel="noopener">probeops.com</a></p>
+</div>
+{% endblock %}
