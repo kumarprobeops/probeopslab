@@ -8,20 +8,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css?v=8">
+    <link rel="stylesheet" href="/static/styles.css?v=9">
 </head>
 <body>
     <header class="header">
         <div class="container">
             <a href="/" class="logo">ProbeOps <span class="logo-sub">Lab</span></a>
             <nav class="nav">
-                <a href="/">Home</a>
-                <a href="/use-cases">Use Cases</a>
-                <a href="/debug">Debug</a>
-                <a href="/cache">Cache</a>
-                <a href="/redirect-lab">Redirects</a>
-                <a href="/tools">Tools</a>
-                <a href="/about">About</a>
+                <a href="/"{% if active_page == 'home' %} class="active"{% endif %}>Home</a>
+                <a href="/use-cases"{% if active_page == 'use-cases' %} class="active"{% endif %}>Use Cases</a>
+                <a href="/debug"{% if active_page == 'debug' %} class="active"{% endif %}>Debug</a>
+                <a href="/cache"{% if active_page == 'cache' %} class="active"{% endif %}>Cache</a>
+                <a href="/redirect-lab"{% if active_page == 'redirects' %} class="active"{% endif %}>Redirects</a>
+                <a href="/tools"{% if active_page == 'tools' %} class="active"{% endif %}>Tools</a>
+                <a href="/about"{% if active_page == 'about' %} class="active"{% endif %}>About</a>
             </nav>
         </div>
     </header>

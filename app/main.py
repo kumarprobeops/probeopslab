@@ -93,28 +93,28 @@ def get_request_context(request: Request) -> dict:
 async def index(request: Request):
     """Lab home page with links to all labs."""
     ctx = get_request_context(request)
-    return templates.TemplateResponse("index.html", {"request": request, "ctx": ctx})
+    return templates.TemplateResponse("index.html", {"request": request, "ctx": ctx, "active_page": "home"})
 
 
 @app.get("/about", response_class=HTMLResponse)
 async def about(request: Request):
     """About page - explains what this lab is and who maintains it."""
     ctx = get_request_context(request)
-    return templates.TemplateResponse("about.html", {"request": request, "ctx": ctx})
+    return templates.TemplateResponse("about.html", {"request": request, "ctx": ctx, "active_page": "about"})
 
 
 @app.get("/use-cases", response_class=HTMLResponse)
 async def use_cases(request: Request):
     """Use cases - real problems you can troubleshoot with this lab."""
     ctx = get_request_context(request)
-    return templates.TemplateResponse("use-cases.html", {"request": request, "ctx": ctx})
+    return templates.TemplateResponse("use-cases.html", {"request": request, "ctx": ctx, "active_page": "use-cases"})
 
 
 @app.get("/debug", response_class=HTMLResponse)
 async def debug(request: Request):
     """Request and geo debug page - sanitized headers display."""
     ctx = get_request_context(request)
-    return templates.TemplateResponse("debug.html", {"request": request, "ctx": ctx})
+    return templates.TemplateResponse("debug.html", {"request": request, "ctx": ctx, "active_page": "debug"})
 
 
 @app.get("/debug.json")
@@ -195,7 +195,7 @@ async def robots():
 async def cache_lab(request: Request):
     """Cache lab index page with documentation."""
     ctx = get_request_context(request)
-    return templates.TemplateResponse("cache_lab.html", {"request": request, "ctx": ctx, "cache_configs": CACHE_CONFIGS})
+    return templates.TemplateResponse("cache_lab.html", {"request": request, "ctx": ctx, "cache_configs": CACHE_CONFIGS, "active_page": "cache"})
 
 
 def create_cache_response(path: str, cache_control: str, description: str) -> Response:
@@ -272,7 +272,7 @@ async def redirect_lab(request: Request):
     """Redirect lab menu with links to all redirect tests."""
     ctx = get_request_context(request)
     return templates.TemplateResponse(
-        "redirect_lab.html", {"request": request, "ctx": ctx}
+        "redirect_lab.html", {"request": request, "ctx": ctx, "active_page": "redirects"}
     )
 
 
@@ -415,7 +415,7 @@ ALLOWED_STATUS_CODES = [200, 201, 204, 400, 401, 403, 404, 405, 408, 429, 500, 5
 async def tools_lab(request: Request):
     """Utility tools lab index page."""
     ctx = get_request_context(request)
-    return templates.TemplateResponse("tools_lab.html", {"request": request, "ctx": ctx})
+    return templates.TemplateResponse("tools_lab.html", {"request": request, "ctx": ctx, "active_page": "tools"})
 
 
 @app.get("/delay/{ms}")
