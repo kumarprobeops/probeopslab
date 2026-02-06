@@ -6,6 +6,7 @@ https://probeopslab.com
 import asyncio
 import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -19,6 +20,10 @@ app = FastAPI(title="ProbeOps Lab", docs_url=None, redoc_url=None)
 # Mount static files and templates
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+
+# Umami analytics website ID (set after creating the site in Umami dashboard)
+UMAMI_WEBSITE_ID = os.environ.get("UMAMI_WEBSITE_ID", "")
+templates.env.globals["umami_website_id"] = UMAMI_WEBSITE_ID
 
 # Allowed headers for /debug endpoint (security: no cookies/auth)
 # Note: x-real-ip removed as it shows Cloudflare edge IP, not user IP (confusing)
@@ -182,8 +187,47 @@ async def echo_endpoint(request: Request):
 
 @app.get("/robots.txt", response_class=PlainTextResponse)
 async def robots():
-    """Disallow all indexing for demo site."""
-    return "User-agent: *\nDisallow: /"
+    """Allow indexing for public pages, block API/utility endpoints."""
+    return """User-agent: *
+Allow: /
+Disallow: /debug.json
+Disallow: /echo
+Disallow: /r/
+Disallow: /final
+Disallow: /delay/
+Disallow: /status/
+Disallow: /size/
+Disallow: /us
+Disallow: /ca
+Disallow: /fi
+Disallow: /row
+Disallow: /host-lab
+Sitemap: https://probeopslab.com/sitemap.xml"""
+
+
+@app.get("/sitemap.xml")
+async def sitemap():
+    """XML sitemap for search engine discovery."""
+    pages = [
+        {"loc": "/", "priority": "1.0", "changefreq": "weekly"},
+        {"loc": "/debug", "priority": "0.8", "changefreq": "monthly"},
+        {"loc": "/cache", "priority": "0.8", "changefreq": "monthly"},
+        {"loc": "/redirect-lab", "priority": "0.8", "changefreq": "monthly"},
+        {"loc": "/tools", "priority": "0.8", "changefreq": "monthly"},
+        {"loc": "/geo-redirect", "priority": "0.7", "changefreq": "monthly"},
+        {"loc": "/use-cases", "priority": "0.7", "changefreq": "monthly"},
+        {"loc": "/about", "priority": "0.5", "changefreq": "monthly"},
+    ]
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    for p in pages:
+        xml += f'  <url>\n'
+        xml += f'    <loc>https://probeopslab.com{p["loc"]}</loc>\n'
+        xml += f'    <changefreq>{p["changefreq"]}</changefreq>\n'
+        xml += f'    <priority>{p["priority"]}</priority>\n'
+        xml += f'  </url>\n'
+    xml += '</urlset>'
+    return Response(content=xml, media_type="application/xml")
 
 
 # =============================================================================

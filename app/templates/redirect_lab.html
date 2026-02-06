@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Redirect Lab{% endblock %}
+{% block title %}HTTP Redirect Lab - Test 301, 302, 307, 308 Redirects{% endblock %}
+{% block meta_description %}Test HTTP redirect status codes 301, 302, 307, and 308 with live endpoints. Understand redirect behavior, method preservation, and SEO implications.{% endblock %}
+{% block og_title %}HTTP Redirect Lab - Test 301, 302, 307, 308 | ProbeOps Lab{% endblock %}
+{% block og_description %}Test HTTP redirect status codes with live endpoints. Understand redirect behavior, method preservation, and SEO implications.{% endblock %}
 
 {% block content %}
 <div class="page-header">
@@ -44,7 +47,7 @@
     <ul class="tips-list">
         <li>Use browser DevTools Network tab to see the redirect chain</li>
         <li>Use <code>curl -I -L</code> to follow redirects and see all headers</li>
-        <li>Test from <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps Terminal</a> in different regions</li>
+        <li>Test from <a href="https://probeops.com?utm_source=probeopslab&utm_medium=tip&utm_campaign=redirects" target="_blank" rel="noopener">ProbeOps Terminal</a> in different regions</li>
         <li>Check if your browser caches 301/308 redirects (clear cache to re-test)</li>
     </ul>
 </div>

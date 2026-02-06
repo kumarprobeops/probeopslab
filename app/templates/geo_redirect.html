@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Geo Redirect{% endblock %}
+{% block title %}Geo Redirect Lab - Test Cloudflare Geo-Based Routing{% endblock %}
+{% block meta_description %}Test Cloudflare geo-based redirect rules. See how visitors from different countries get routed to region-specific landing pages using Cloudflare edge rules.{% endblock %}
+{% block og_title %}Geo Redirect Lab - Cloudflare Geo-Based Routing | ProbeOps Lab{% endblock %}
+{% block og_description %}Test Cloudflare geo-based redirect rules. See how visitors from different countries get routed to region-specific pages.{% endblock %}
 
 {% block content %}
 <div class="page-header">
@@ -65,6 +68,6 @@
 </div>
 
 <div class="tip-box">
-    <p><strong>Tip:</strong> Geo routing is easiest to verify from multiple regions. ProbeOps can run this from 6+ locations → <a href="https://probeops.com" target="_blank" rel="noopener">probeops.com</a></p>
+    <p><strong>Tip:</strong> Geo routing is easiest to verify from multiple regions. ProbeOps can run this from 6+ locations → <a href="https://probeops.com?utm_source=probeopslab&utm_medium=tip&utm_campaign=geo" target="_blank" rel="noopener">probeops.com</a></p>
 </div>
 {% endblock %}

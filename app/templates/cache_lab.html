@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Cache Lab{% endblock %}
+{% block title %}Cache-Control Header Testing Tool{% endblock %}
+{% block meta_description %}Test HTTP Cache-Control headers with live endpoints. Compare public, private, no-store, s-maxage, stale-while-revalidate, and immutable caching directives.{% endblock %}
+{% block og_title %}Cache-Control Header Testing Tool | ProbeOps Lab{% endblock %}
+{% block og_description %}Test HTTP Cache-Control headers with live endpoints. Compare caching directives and verify CDN behavior.{% endblock %}
 
 {% block content %}
 <div class="page-header">
@@ -111,6 +114,6 @@ curl -H "If-None-Match: \"abc123\"" https://{{ ctx.host }}/cache/public-short</c
 </div>
 
 <div class="tip-box">
-    <p><strong>Tip:</strong> Cache behavior can vary by edge/region and over time. ProbeOps can run this from 6+ locations → <a href="https://probeops.com" target="_blank" rel="noopener">probeops.com</a></p>
+    <p><strong>Tip:</strong> Cache behavior can vary by edge/region and over time. ProbeOps can run this from 6+ locations → <a href="https://probeops.com?utm_source=probeopslab&utm_medium=tip&utm_campaign=cache" target="_blank" rel="noopener">probeops.com</a></p>
 </div>
 {% endblock %}

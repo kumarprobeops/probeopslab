@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Debug{% endblock %}
+{% block title %}HTTP Request Debug Tool - View Headers, IP & Geo Info{% endblock %}
+{% block meta_description %}See your HTTP request headers, IP address, geo location, and Cloudflare edge info as seen by an origin server. Free debug tool for DevOps engineers.{% endblock %}
+{% block og_title %}HTTP Request Debug Tool | ProbeOps Lab{% endblock %}
+{% block og_description %}See your HTTP request headers, IP address, geo location, and Cloudflare edge info as seen by an origin server.{% endblock %}
 
 {% block content %}
 <div class="page-header">
@@ -103,6 +106,6 @@
 </div>
 
 <div class="tip-box">
-    <p><strong>Tip:</strong> Need to see how this looks from multiple regions? ProbeOps can run it from 6+ locations → <a href="https://probeops.com" target="_blank" rel="noopener">probeops.com</a></p>
+    <p><strong>Tip:</strong> Need to see how this looks from multiple regions? ProbeOps can run it from 6+ locations → <a href="https://probeops.com?utm_source=probeopslab&utm_medium=tip&utm_campaign=debug" target="_blank" rel="noopener">probeops.com</a></p>
 </div>
 {% endblock %}

@@ -10,6 +10,8 @@ services:
     restart: unless-stopped
     expose:
       - "8000"
+    environment:
+      - UMAMI_WEBSITE_ID=${UMAMI_WEBSITE_ID:-}
     networks:
       - cf-demo-network
     healthcheck:
@@ -35,10 +37,49 @@ services:
       - ./certbot/www:/var/www/certbot:ro
     depends_on:
       - app
+      - umami
     networks:
       - cf-demo-network
     entrypoint: ["/docker-entrypoint.sh"]
     command: ["/bin/sh", "-c", "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"]
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: cf-demo-umami
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD:-umami_secret}@umami-db:5432/umami
+      APP_SECRET: ${UMAMI_APP_SECRET:-replace_me_with_random_string}
+    depends_on:
+      umami-db:
+        condition: service_healthy
+    networks:
+      - cf-demo-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  umami-db:
+    image: postgres:16-alpine
+    container_name: cf-demo-umami-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${UMAMI_DB_PASSWORD:-umami_secret}
+    volumes:
+      - umami-db-data:/var/lib/postgresql/data
+    networks:
+      - cf-demo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umami"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   certbot:
     build:
@@ -53,6 +94,9 @@ services:
       - ./certbot/www:/var/www/certbot
     networks:
       - cf-demo-network
+
+volumes:
+  umami-db-data:
 
 networks:
   cf-demo-network:

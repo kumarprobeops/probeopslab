@@ -3,12 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
     <title>{% block title %}CDN & Edge Testing Lab{% endblock %} | ProbeOps</title>
+    <meta name="description" content="{% block meta_description %}Free online tools for testing HTTP redirects, caching, geo-routing, and request headers behind Cloudflare and other CDNs.{% endblock %}">
+    <link rel="canonical" href="{% block canonical %}https://probeopslab.com{{ request.url.path }}{% endblock %}">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="ProbeOps Lab">
+    <meta property="og:title" content="{% block og_title %}CDN & Edge Testing Lab | ProbeOps{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Free online tools for testing HTTP redirects, caching, geo-routing, and request headers behind Cloudflare and other CDNs.{% endblock %}">
+    <meta property="og:url" content="https://probeopslab.com{{ request.url.path }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css?v=9">
+    <link rel="stylesheet" href="/static/styles.css?v=10">
+    {% block head_extra %}{% endblock %}
+    <script defer src="/script.js" data-website-id="{{ umami_website_id | default('') }}"></script>
 </head>
 <body>
     <header class="header">
@@ -34,8 +45,8 @@
 
     <footer class="footer">
         <div class="container">
-            <p>A <a href="https://probeops.com" target="_blank" rel="noopener">ProbeOps</a> project · <a href="/about">About</a></p>
-            <p class="footer-meta">Request ID: {{ ctx.request_id }} | {{ ctx.timestamp }}</p>
+            <p>A <a href="https://probeops.com?utm_source=probeopslab&utm_medium=footer&utm_campaign=branding" target="_blank" rel="noopener">ProbeOps</a> project · <a href="/about">About</a></p>
+            <p class="footer-meta">Need multi-region monitoring? <a href="https://probeops.com?utm_source=probeopslab&utm_medium=footer&utm_campaign=cta" target="_blank" rel="noopener">Try ProbeOps</a></p>
         </div>
     </footer>
 </body>
