@@ -107,6 +107,15 @@ http {
             proxy_set_header Connection "upgrade";
         }
 
+        # Umami Next.js assets (referenced as /_next/ in Umami HTML)
+        location /_next/ {
+            proxy_pass http://umami;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_cache_valid 200 1d;
+            add_header Cache-Control "public, max-age=86400";
+        }
+
         # Umami tracking script
         location = /stats/script.js {
             proxy_pass http://umami/script.js;
