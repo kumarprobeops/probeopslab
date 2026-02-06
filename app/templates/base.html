@@ -7,38 +7,106 @@
     <meta name="description" content="{% block meta_description %}Free online tools for testing HTTP redirects, caching, geo-routing, and request headers behind Cloudflare and other CDNs.{% endblock %}">
     <link rel="canonical" href="{% block canonical %}https://probeopslab.com{{ request.url.path }}{% endblock %}">
 
+    <!-- Favicon -->
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="ProbeOps Lab">
     <meta property="og:title" content="{% block og_title %}CDN & Edge Testing Lab | ProbeOps{% endblock %}">
     <meta property="og:description" content="{% block og_description %}Free online tools for testing HTTP redirects, caching, geo-routing, and request headers behind Cloudflare and other CDNs.{% endblock %}">
     <meta property="og:url" content="https://probeopslab.com{{ request.url.path }}">
+    <meta property="og:image" content="https://probeopslab.com/static/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}CDN & Edge Testing Lab | ProbeOps{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Free online tools for testing HTTP redirects, caching, geo-routing, and request headers behind Cloudflare and other CDNs.{% endblock %}">
+    <meta name="twitter:image" content="https://probeopslab.com/static/og-image.png">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ProbeOps Lab",
+        "url": "https://probeopslab.com",
+        "description": "Free, open-source testing lab for HTTP redirects, caching, geo-routing, and request debugging behind Cloudflare and other CDNs.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "ProbeOps",
+            "url": "https://probeops.com"
+        }
+    }
+    </script>
+    {% if breadcrumbs %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://probeopslab.com/"
+            }{% for crumb in breadcrumbs %},
+            {
+                "@type": "ListItem",
+                "position": {{ loop.index + 1 }},
+                "name": "{{ crumb.name }}"{% if crumb.url %},
+                "item": "https://probeopslab.com{{ crumb.url }}"{% endif %}
+            }{% endfor %}
+        ]
+    }
+    </script>
+    {% endif %}
+    {% block json_ld %}{% endblock %}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css?v=10">
+    <link rel="stylesheet" href="/static/styles.css?v=12">
     {% block head_extra %}{% endblock %}
     <script defer src="https://stats.probeopslab.com/script.js" data-website-id="{{ umami_website_id | default('') }}"></script>
 </head>
 <body>
     <header class="header">
         <div class="container">
-            <a href="/" class="logo">ProbeOps <span class="logo-sub">Lab</span></a>
-            <nav class="nav">
-                <a href="/"{% if active_page == 'home' %} class="active"{% endif %}>Home</a>
-                <a href="/use-cases"{% if active_page == 'use-cases' %} class="active"{% endif %}>Use Cases</a>
-                <a href="/debug"{% if active_page == 'debug' %} class="active"{% endif %}>Debug</a>
-                <a href="/cache"{% if active_page == 'cache' %} class="active"{% endif %}>Cache</a>
-                <a href="/redirect-lab"{% if active_page == 'redirects' %} class="active"{% endif %}>Redirects</a>
-                <a href="/tools"{% if active_page == 'tools' %} class="active"{% endif %}>Tools</a>
-                <a href="/about"{% if active_page == 'about' %} class="active"{% endif %}>About</a>
+            <a href="/" class="logo" aria-label="ProbeOps Lab home">ProbeOps <span class="logo-sub">Lab</span></a>
+            <nav class="nav" aria-label="Main navigation">
+                <a href="/"{% if active_page == 'home' %} class="active" aria-current="page"{% endif %}>Home</a>
+                <a href="/use-cases"{% if active_page == 'use-cases' %} class="active" aria-current="page"{% endif %}>Use Cases</a>
+                <a href="/debug"{% if active_page == 'debug' %} class="active" aria-current="page"{% endif %}>Debug</a>
+                <a href="/cache"{% if active_page == 'cache' %} class="active" aria-current="page"{% endif %}>Cache</a>
+                <a href="/redirect-lab"{% if active_page == 'redirects' %} class="active" aria-current="page"{% endif %}>Redirects</a>
+                <a href="/tools"{% if active_page == 'tools' %} class="active" aria-current="page"{% endif %}>Tools</a>
+                <a href="/about"{% if active_page == 'about' %} class="active" aria-current="page"{% endif %}>About</a>
             </nav>
         </div>
     </header>
 
     <main class="main">
         <div class="container">
+            {% if breadcrumbs %}
+            <nav class="breadcrumbs" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    {% for crumb in breadcrumbs %}
+                    <li>{% if crumb.url %}<a href="{{ crumb.url }}">{{ crumb.name }}</a>{% else %}<span aria-current="page">{{ crumb.name }}</span>{% endif %}</li>
+                    {% endfor %}
+                </ol>
+            </nav>
+            {% endif %}
             {% block content %}{% endblock %}
         </div>
     </main>
