@@ -202,7 +202,103 @@ Disallow: /ca
 Disallow: /fi
 Disallow: /row
 Disallow: /host-lab
+
+# LLM crawlers welcome
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
 Sitemap: https://probeopslab.com/sitemap.xml"""
+
+
+@app.get("/llms.txt", response_class=PlainTextResponse)
+async def llms_txt():
+    """Machine-readable file for LLM crawlers describing ProbeOps Lab."""
+    return """# ProbeOps Lab
+> Free, open-source testing lab for HTTP redirects, caching, geo-routing, and request debugging behind Cloudflare and other CDNs.
+
+## Overview
+ProbeOps Lab (probeopslab.com) is a public reference site built for DevOps engineers, SREs, and CDN specialists. It provides live, interactive endpoints for testing and understanding HTTP behavior at the edge. No authentication, no cookies, no tracking. Fully stateless.
+
+Maintained by ProbeOps (probeops.com), a network monitoring and diagnostic platform.
+
+## Live Testing Tools
+
+### Request Debug Tool
+- URL: https://probeopslab.com/debug
+- Shows HTTP request headers, client IP, geo-location, and Cloudflare edge info as seen by the origin server
+- JSON API: https://probeopslab.com/debug.json
+
+### HTTP Redirect Lab
+- URL: https://probeopslab.com/redirect-lab
+- Test 301 (Permanent), 302 (Found), 307 (Temporary), 308 (Permanent) redirects
+- Endpoints: /r/301, /r/302, /r/307, /r/308 → all redirect to /final
+- Useful for testing redirect chain behavior, method preservation, and SEO implications
+
+### Cache-Control Header Lab
+- URL: https://probeopslab.com/cache
+- Test 8 caching directives: public-short, public-long, no-store, no-cache, private, s-maxage, stale-while-revalidate, immutable
+- Each returns JSON with appropriate Cache-Control headers
+- Endpoints: /cache/public-short, /cache/no-store, /cache/s-maxage, etc.
+
+### Geo Redirect Lab
+- URL: https://probeopslab.com/geo-redirect
+- Demonstrates Cloudflare geo-based routing
+- Visitors from US, Canada, Finland get country-specific landing pages
+- Uses Cloudflare edge rules for redirect logic
+
+### HTTP Utility Tools
+- URL: https://probeopslab.com/tools
+- Response Delay: /delay/{ms} — configurable delay up to 10 seconds
+- Status Codes: /status/{code} — returns specific HTTP status codes (200, 301, 404, 500, etc.)
+- Response Size: /size/{bytes} — returns payload of exact byte size (up to 1MB)
+
+### Echo Endpoint
+- URL: https://probeopslab.com/echo
+- Returns request details as JSON with useful response headers (X-Request-Id, X-Client-IP, X-Country)
+
+## Use Cases
+- URL: https://probeopslab.com/use-cases
+- VPN/proxy leak detection via geo headers
+- CDN cache validation across regions
+- Redirect chain debugging for SEO
+- Timeout and slow-backend handling
+- Proxy header stripping detection
+- Large file download testing
+
+## About
+- URL: https://probeopslab.com/about
+- Open-source: https://github.com/kumarprobeops/probeopslab
+- Built with: FastAPI, NGINX, Docker, Cloudflare
+- No authentication required, fully stateless
+- Hosted on Hetzner Cloud (Helsinki)
+
+## Related
+- ProbeOps Platform: https://probeops.com — Network monitoring with multi-region probe infrastructure (SSL checks, DNS lookups, latency tests, traceroutes, port checks)
+"""
 
 
 @app.get("/sitemap.xml")
@@ -217,6 +313,7 @@ async def sitemap():
         {"loc": "/geo-redirect", "priority": "0.7", "changefreq": "monthly"},
         {"loc": "/use-cases", "priority": "0.7", "changefreq": "monthly"},
         {"loc": "/about", "priority": "0.5", "changefreq": "monthly"},
+        {"loc": "/llms.txt", "priority": "0.3", "changefreq": "monthly"},
     ]
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
